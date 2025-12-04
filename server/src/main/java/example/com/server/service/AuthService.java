@@ -1,31 +1,29 @@
 package example.com.server.service;
 
 import example.com.server.model.User;
+import example.com.server.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
-import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicLong;
 
 @Service
 public class AuthService {
 
-    private final Map<String, User> usersByLogin = new ConcurrentHashMap<>();
-    private final AtomicLong idGenerator = new AtomicLong(1);
+    @Autowired
+    private UserRepository userRepository;
 
     public User register(User user) {
         if (user == null || user.getLogin() == null) {
             throw new IllegalArgumentException("Login is required");
         }
 
-        if (existsByLogin(user.getLogin())) {
+        if (userRepository.findByLogin(user.getLogin()).isPresent()) {
             throw new IllegalArgumentException("User with this login already exists");
         }
 
-        user.setId(idGenerator.getAndIncrement());
-        usersByLogin.put(user.getLogin(), user);
+        userRepository.save(user);
         return user;
     }
 
@@ -33,14 +31,7 @@ public class AuthService {
         if (login == null) {
             return Optional.empty();
         }
-        return Optional.ofNullable(usersByLogin.get(login));
-    }
-
-    public boolean existsByLogin(String login) {
-        if (login == null) {
-            return false;
-        }
-        return usersByLogin.containsKey(login);
+        return userRepository.findByLogin(login);
     }
 
     public Optional<User> login(String login, String password) {
@@ -53,7 +44,7 @@ public class AuthService {
     }
 
     public Collection<User> getAllUsers() {
-        return usersByLogin.values();
+        return userRepository.findAll();
     }
 }
 

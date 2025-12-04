@@ -1,11 +1,21 @@
 package example.com.server.model;
 
+import jakarta.persistence.*;
+
+@Entity
 public class User {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "iduser")
     private Long id;
+    @Column(name = "full_name")
     private String fullName;
+    @Column(name = "login")
     private String login;
+    @Column(name = "email")
     private String email;
+    @Column(name = "password")
     private String password;
 
     public User() {
