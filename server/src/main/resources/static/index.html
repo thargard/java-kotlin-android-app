@@ -1,17 +1,173 @@
 <!DOCTYPE html>
-<html ng-app="myApp">
+<html lang="en" ng-app="myApp">
 <head>
   <meta charset="UTF-8">
-  <title>Spring + AngularJS</title>
+  <title>Spring + AngularJS Auth</title>
   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
   <script src="app.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+      margin: 0;
+      padding: 40px 0;
+    }
+    .container {
+      max-width: 480px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 24px 28px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    h1, h2 {
+      text-align: center;
+      margin-top: 0;
+    }
+    label {
+      display: block;
+      margin-top: 12px;
+      margin-bottom: 4px;
+      font-weight: bold;
+    }
+    input[type="text"],
+    input[type="password"],
+    input[type="email"] {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+      font-size: 14px;
+    }
+    .actions {
+      margin-top: 16px;
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+    button {
+      padding: 8px 16px;
+      border-radius: 4px;
+      border: none;
+      cursor: pointer;
+      background-color: #1976d2;
+      color: #fff;
+      font-size: 14px;
+    }
+    button.secondary {
+      background-color: #e0e0e0;
+      color: #333;
+    }
+    button:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+    .message {
+      margin-top: 12px;
+      padding: 10px;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    .message.error {
+      background-color: #ffebee;
+      color: #c62828;
+    }
+    .message.success {
+      background-color: #e8f5e9;
+      color: #2e7d32;
+    }
+    .link {
+      margin-top: 16px;
+      text-align: center;
+      font-size: 14px;
+    }
+    .link a {
+      color: #1976d2;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .link a:hover {
+      text-decoration: underline;
+    }
+  </style>
 </head>
 <body ng-controller="MainCtrl">
-  <h2>Введите имя:</h2>
-  <input type="text" ng-model="userName" placeholder="Ваше имя">
-  <button ng-click="sendName()">Отправить</button>
+<div class="container">
+  <!-- Login page -->
+  <div ng-show="currentPage === 'login'">
+    <h1>Login</h1>
 
-  <h3>Ответ сервера:</h3>
-  <p>{{serverResponse}}</p>
+    <label for="loginLogin">Login</label>
+    <input id="loginLogin" type="text" ng-model="loginForm.login" placeholder="Enter your login">
+
+    <label for="loginPassword">Password</label>
+    <input id="loginPassword" type="password" ng-model="loginForm.password" placeholder="Enter your password">
+
+    <div class="actions">
+      <button ng-click="doLogin()" ng-disabled="loading">Login</button>
+    </div>
+
+    <div class="message error" ng-if="errorMessage">
+      {{ errorMessage }}
+    </div>
+
+    <div class="link">
+      <span>Don't have an account? <a ng-click="goTo('register')">Register</a></span>
+    </div>
+  </div>
+
+  <!-- Registration page -->
+  <div ng-show="currentPage === 'register'">
+    <h1>Register</h1>
+
+    <label for="regFullName">Full name</label>
+    <input id="regFullName" type="text" ng-model="registerForm.fullName" placeholder="Your full name">
+
+    <label for="regLogin">Login</label>
+    <input id="regLogin" type="text" ng-model="registerForm.login" placeholder="Choose a login">
+
+    <label for="regEmail">Email</label>
+    <input id="regEmail" type="email" ng-model="registerForm.email" placeholder="Your email">
+
+    <label for="regPassword">Password</label>
+    <input id="regPassword" type="password" ng-model="registerForm.password" placeholder="Create a password">
+
+    <div class="actions">
+      <button class="secondary" ng-click="goTo('login')" ng-disabled="loading">Back</button>
+      <button ng-click="doRegister()" ng-disabled="loading">Register</button>
+    </div>
+
+    <div class="message error" ng-if="errorMessage">
+      {{ errorMessage }}
+    </div>
+  </div>
+
+  <!-- Welcome page -->
+  <div ng-show="currentPage === 'welcome'">
+    <h1>Welcome</h1>
+    <h2 ng-if="currentUser.fullName">Hello, {{ currentUser.fullName }}!</h2>
+    <h2 ng-if="!currentUser.fullName && currentUser.login">Hello, {{ currentUser.login }}!</h2>
+
+    <p class="message success" ng-if="successMessage">
+      {{ successMessage }}
+    </p>
+
+    <!-- Optional: greeting endpoint demo -->
+    <h3>Test greeting endpoint</h3>
+    <label for="greetName">Name for greeting</label>
+    <input id="greetName" type="text" ng-model="greetName" placeholder="Name for /api/greet">
+    <div class="actions">
+      <button ng-click="sendName()" ng-disabled="loadingGreet">Send</button>
+    </div>
+    <p><strong>Server response:</strong> {{ serverResponse }}</p>
+
+    <div class="link">
+      <a ng-click="logout()">Log out</a>
+    </div>
+  </div>
+</div>
 </body>
 </html>
+
+
