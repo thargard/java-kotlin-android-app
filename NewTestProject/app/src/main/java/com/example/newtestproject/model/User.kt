@@ -1,0 +1,8 @@
+package com.example.newtestproject.model
+
+data class User(
+    val login: String,
+    val password: String,
+    val email: String? = null,
+    val fullName: String? = null
+)
