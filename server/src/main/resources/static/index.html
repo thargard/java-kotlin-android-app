@@ -133,6 +133,9 @@
     <label for="regPassword">Password</label>
     <input id="regPassword" type="password" ng-model="registerForm.password" placeholder="Create a password">
 
+    <label for="regConfirmPassword">Confirm Password</label>
+    <input id="regConfirmPassword" type="password" ng-model="registerForm.confirmPassword" placeholder="Confirm your password">
+
     <div class="actions">
       <button class="secondary" ng-click="goTo('login')" ng-disabled="loading">Back</button>
       <button ng-click="doRegister()" ng-disabled="loading">Register</button>

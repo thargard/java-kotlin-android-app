@@ -13,7 +13,8 @@ app.controller('MainCtrl', function($scope, $http) {
     fullName: '',
     login: '',
     email: '',
-    password: ''
+    password: '',
+    confirmPassword: ''
   };
 
   $scope.currentUser = {};
@@ -54,6 +55,13 @@ app.controller('MainCtrl', function($scope, $http) {
   $scope.doRegister = function() {
     $scope.errorMessage = '';
     $scope.successMessage = '';
+    
+    // Validate that passwords match
+    if ($scope.registerForm.password !== $scope.registerForm.confirmPassword) {
+      $scope.errorMessage = 'Passwords do not match';
+      return;
+    }
+    
     $scope.loading = true;
 
     $http.post('/api/auth/register', {
@@ -92,7 +100,7 @@ app.controller('MainCtrl', function($scope, $http) {
   $scope.logout = function() {
     $scope.currentUser = {};
     $scope.loginForm = { login: '', password: '' };
-    $scope.registerForm = { fullName: '', login: '', email: '', password: '' };
+    $scope.registerForm = { fullName: '', login: '', email: '', password: '', confirmPassword: '' };
     $scope.greetName = '';
     $scope.serverResponse = '';
     $scope.errorMessage = '';
