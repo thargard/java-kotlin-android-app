@@ -23,7 +23,8 @@ public class AuthController {
     public ResponseEntity<?> register(@RequestBody User user) {
         try {
             User created = authService.register(user);
-            created.setPassword(user.getPassword());
+            // объект который вернется клиенту, но типа здесь не должно быть пароля даже зашифрованного
+            created.setPassword(null); 
             return ResponseEntity.status(HttpStatus.CREATED).body(created);
         } catch (IllegalArgumentException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
