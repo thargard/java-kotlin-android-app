@@ -2,8 +2,9 @@
 <html lang="en" ng-app="myApp">
 <head>
   <meta charset="UTF-8">
-  <title>Spring + AngularJS Auth</title>
+  <title>{{ 'TITLE' | translate }}</title>
   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-translate/2.18.1/angular-translate.min.js"></script>
   <script src="app.js"></script>
   <style>
     body {
@@ -13,10 +14,12 @@
       padding: 40px 0;
     }
     .container {
+      position: relative;
       max-width: 480px;
       margin: 0 auto;
       background: #ffffff;
       padding: 24px 28px;
+      padding-top: 60px;
       border-radius: 8px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
@@ -90,22 +93,52 @@
     .link a:hover {
       text-decoration: underline;
     }
+    .language-selector {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      z-index: 10;
+    }
+    .language-selector label {
+      margin: 0;
+      font-size: 14px;
+      font-weight: normal;
+      white-space: nowrap;
+    }
+    .language-selector select {
+      padding: 6px 10px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body ng-controller="MainCtrl">
 <div class="container">
+  <!-- Language selector -->
+  <div class="language-selector">
+    <label for="langSelect">{{ 'LANGUAGE' | translate }}:</label>
+    <select id="langSelect" ng-model="currentLang" ng-change="changeLanguage(currentLang)">
+      <option value="en">{{ 'ENGLISH' | translate }}</option>
+      <option value="ru">{{ 'RUSSIAN' | translate }}</option>
+    </select>
+  </div>
   <!-- Login page -->
   <div ng-show="currentPage === 'login'">
-    <h1>Login</h1>
+    <h1>{{ 'LOGIN' | translate }}</h1>
 
-    <label for="loginLogin">Login</label>
-    <input id="loginLogin" type="text" ng-model="loginForm.login" placeholder="Enter your login">
+    <label for="loginLogin">{{ 'LOGIN_FIELD' | translate }}</label>
+    <input id="loginLogin" type="text" ng-model="loginForm.login" placeholder="{{ 'ENTER_LOGIN' | translate }}">
 
-    <label for="loginPassword">Password</label>
-    <input id="loginPassword" type="password" ng-model="loginForm.password" placeholder="Enter your password">
+    <label for="loginPassword">{{ 'PASSWORD' | translate }}</label>
+    <input id="loginPassword" type="password" ng-model="loginForm.password" placeholder="{{ 'ENTER_PASSWORD' | translate }}">
 
     <div class="actions">
-      <button ng-click="doLogin()" ng-disabled="loading">Login</button>
+      <button ng-click="doLogin()" ng-disabled="loading">{{ 'LOGIN' | translate }}</button>
     </div>
 
     <div class="message error" ng-if="errorMessage">
@@ -113,32 +146,32 @@
     </div>
 
     <div class="link">
-      <span>Don't have an account? <a ng-click="goTo('register')">Register</a></span>
+      <span>{{ 'DONT_HAVE_ACCOUNT' | translate }} <a ng-click="goTo('register')">{{ 'REGISTER' | translate }}</a></span>
     </div>
   </div>
 
   <!-- Registration page -->
   <div ng-show="currentPage === 'register'">
-    <h1>Register</h1>
+    <h1>{{ 'REGISTER' | translate }}</h1>
 
-    <label for="regFullName">Full name</label>
-    <input id="regFullName" type="text" ng-model="registerForm.fullName" placeholder="Your full name">
+    <label for="regFullName">{{ 'FULL_NAME' | translate }}</label>
+    <input id="regFullName" type="text" ng-model="registerForm.fullName" placeholder="{{ 'YOUR_FULL_NAME' | translate }}">
 
-    <label for="regLogin">Login</label>
-    <input id="regLogin" type="text" ng-model="registerForm.login" placeholder="Choose a login">
+    <label for="regLogin">{{ 'LOGIN_FIELD' | translate }}</label>
+    <input id="regLogin" type="text" ng-model="registerForm.login" placeholder="{{ 'CHOOSE_LOGIN' | translate }}">
 
-    <label for="regEmail">Email</label>
-    <input id="regEmail" type="email" ng-model="registerForm.email" placeholder="Your email">
+    <label for="regEmail">{{ 'EMAIL' | translate }}</label>
+    <input id="regEmail" type="email" ng-model="registerForm.email" placeholder="{{ 'YOUR_EMAIL' | translate }}">
 
-    <label for="regPassword">Password</label>
-    <input id="regPassword" type="password" ng-model="registerForm.password" placeholder="Create a password">
+    <label for="regPassword">{{ 'PASSWORD' | translate }}</label>
+    <input id="regPassword" type="password" ng-model="registerForm.password" placeholder="{{ 'CREATE_PASSWORD' | translate }}">
 
-    <label for="regConfirmPassword">Confirm Password</label>
-    <input id="regConfirmPassword" type="password" ng-model="registerForm.confirmPassword" placeholder="Confirm your password">
+    <label for="regConfirmPassword">{{ 'CONFIRM_PASSWORD' | translate }}</label>
+    <input id="regConfirmPassword" type="password" ng-model="registerForm.confirmPassword" placeholder="{{ 'CONFIRM_YOUR_PASSWORD' | translate }}">
 
     <div class="actions">
-      <button class="secondary" ng-click="goTo('login')" ng-disabled="loading">Back</button>
-      <button ng-click="doRegister()" ng-disabled="loading">Register</button>
+      <button class="secondary" ng-click="goTo('login')" ng-disabled="loading">{{ 'BACK' | translate }}</button>
+      <button ng-click="doRegister()" ng-disabled="loading">{{ 'REGISTER' | translate }}</button>
     </div>
 
     <div class="message error" ng-if="errorMessage">
@@ -148,25 +181,25 @@
 
   <!-- Welcome page -->
   <div ng-show="currentPage === 'welcome'">
-    <h1>Welcome</h1>
-    <h2 ng-if="currentUser.fullName">Hello, {{ currentUser.fullName }}!</h2>
-    <h2 ng-if="!currentUser.fullName && currentUser.login">Hello, {{ currentUser.login }}!</h2>
+    <h1>{{ 'WELCOME' | translate }}</h1>
+    <h2 ng-if="currentUser.fullName">{{ 'HELLO' | translate: {name: currentUser.fullName} }}</h2>
+    <h2 ng-if="!currentUser.fullName && currentUser.login">{{ 'HELLO' | translate: {name: currentUser.login} }}</h2>
 
     <p class="message success" ng-if="successMessage">
       {{ successMessage }}
     </p>
 
     <!-- Optional: greeting endpoint demo -->
-    <h3>Test greeting endpoint</h3>
-    <label for="greetName">Name for greeting</label>
-    <input id="greetName" type="text" ng-model="greetName" placeholder="Name for /api/greet">
+    <h3>{{ 'TEST_GREETING_ENDPOINT' | translate }}</h3>
+    <label for="greetName">{{ 'NAME_FOR_GREETING' | translate }}</label>
+    <input id="greetName" type="text" ng-model="greetName" placeholder="{{ 'NAME_FOR_API_GREET' | translate }}">
     <div class="actions">
-      <button ng-click="sendName()" ng-disabled="loadingGreet">Send</button>
+      <button ng-click="sendName()" ng-disabled="loadingGreet">{{ 'SEND' | translate }}</button>
     </div>
-    <p><strong>Server response:</strong> {{ serverResponse }}</p>
+    <p><strong>{{ 'SERVER_RESPONSE' | translate }}</strong> {{ serverResponse }}</p>
 
     <div class="link">
-      <a ng-click="logout()">Log out</a>
+      <a ng-click="logout()">{{ 'LOG_OUT' | translate }}</a>
     </div>
   </div>
 </div>
