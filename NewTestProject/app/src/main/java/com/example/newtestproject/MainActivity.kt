@@ -20,6 +20,7 @@ import androidx.navigation.navDeepLink
 import com.example.newtestproject.components.LanguageButton
 import com.example.newtestproject.util.LanguageManager
 import com.example.newtestproject.util.LanguagePrefs
+import com.example.newtestproject.screen.FirstScreen
 import com.example.newtestproject.screen.AuthScreen
 import com.example.newtestproject.screen.GreetingScreen
 
@@ -45,19 +46,28 @@ class MainActivity : AppCompatActivity() {
             ) { padding ->
                 NavHost(
                     navController = navController,
-                    startDestination = "auth",
+                    startDestination = "first",
                     modifier = Modifier.padding(padding)
                 ) {
+                    composable("first") {
+                        FirstScreen(
+                            onStartAuth = {
+                                navController.navigate("auth") {
+                                    launchSingleTop = true
+                                }
+                            }
+                        )
+                    }
                     composable("auth") {
                         AuthScreen(
                             onLoginSuccess = { fullName ->
                                 navController.navigate("greeting/${Uri.encode(fullName)}") {
-                                    popUpTo("auth") { inclusive = false }
+                                    popUpTo("first") { inclusive = false }
                                 }
                             },
                             onRegisterSuccess = { fullName ->
                                 navController.navigate("greeting/${Uri.encode(fullName)}") {
-                                    popUpTo("auth") { inclusive = false }
+                                    popUpTo("first") { inclusive = false }
                                 }
                             }
                         )
@@ -71,7 +81,7 @@ class MainActivity : AppCompatActivity() {
                         GreetingScreen(
                             fullName = fullName,
                             onLogout = {
-                                navController.popBackStack("auth", inclusive = false)
+                                navController.popBackStack("first", inclusive = false)
                             }
                         )
                     }

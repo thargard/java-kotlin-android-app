@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Приложение</string>
+    <string name="app_name">ArtizanHub</string>
     <string name="choose_language">Выберите язык</string>
     <string name="follow_system">Язык системы</string>
     <string name="log_reg">Войдите или Зарегистрируйтесь</string>
@@ -20,4 +20,7 @@
     <string name="registration_failed">Регистрация не удалась </string>
     <string name="greetings">Приветствуем,</string>
     <string name="logout">Выйти из аккаунта</string>
+    <string name="welcome_title">Добро пожаловать в ArtizanHub</string>
+    <string name="welcome_message">Коротко о приложении: войдите или зарегистрируйтесь, чтобы продолжить.</string>
+    <string name="start_auth_button">Перейти к входу или регистрации</string>
 </resources>
