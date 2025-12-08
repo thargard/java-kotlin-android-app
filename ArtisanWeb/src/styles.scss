@@ -1,0 +1,597 @@
+
+
+/* Custom Theming for Angular Material */
+/* For more information: https://material.angular.io/guide/theming */
+@use '@angular/material' as mat;
+
+@include mat.elevation-classes();
+@include mat.app-background();
+/* Plus imports for other components in your app. */
+
+/* Include the common styles for Angular Material. We include this here so that you only */
+/* have to load a single css file for Angular Material in your app. */
+/* Be sure that you only ever include this mixin once! */
+
+/* Define the palettes for your theme using the Material Design palettes available in palette.scss */
+/* (imported above). For each palette, you can optionally specify a default, lighter, and darker */
+/* hue. Available color palettes: https://material.io/design/color/ */
+$ft-primary: mat.m2-define-palette(mat.$m2-indigo-palette);
+$ft-accent: mat.m2-define-palette(mat.$m2-pink-palette, A200, A100, A400);
+
+/* Create the theme object. A theme consists of configurations for individual */
+/* theming systems such as "color" or "typography". */
+$ft-theme: mat.m2-define-light-theme(
+  (
+    color: (
+      primary: $ft-primary,
+      accent: $ft-accent
+    )
+  )
+);
+
+/* Include theme styles for core and each component used in your app. */
+/* Alternatively, you can import and @include the theme mixins for each component */
+/* that you are using. */
+@include mat.all-component-themes($ft-theme);
+
+/* You can add global styles to this file, and also import other style files */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: 'Poppins';
+  src: local('Poppins'), url(./assets/fonts/Poppins-Regular.ttf) format('truetype');
+}
+
+@font-face {
+  font-family: 'Roboto';
+  src: local('Roboto'), url(./assets/fonts/Roboto-Regular.ttf) format('truetype');
+}
+
+/* override @veex/sor lib fonts */
+:root {
+  --vx-override-verdana-font-family: 'Poppins';
+  --vx-override-lucida-sans-unicode-font-family: 'Poppins';
+  --vx-override-lucida-sans-unicode-font-family: 'Poppins';
+  --vx-override-times-new-roman-font-family: 'Poppins';
+  --vx-override-times-new-roman-font-size: 14px;
+}
+
+@layer components {
+  .background-base {
+    @apply bg-rtu-primary-bg
+      dark:bg-rtu-dark-second-bg;
+  }
+
+  .ring-visible-base {
+    @apply focus-visible:outline-none
+    focus-visible:ring-1
+    focus-visible:ring-black
+    dark:focus-visible:ring-white;
+  }
+
+  .border-base {
+    @apply border border-gray-300
+    bg-rtu-primary-bg
+    focus:border-black
+    focus:outline-none
+    focus:ring-0
+    dark:border-[#575859]
+    focus:dark:border-white;
+  }
+
+  /*
+     The idea is to show the border only if user uses a keyboard.
+     That's why focus-visible is used.
+     This works fine in Firefox, but Chrome doesn't handle focus-visible in select currently
+
+     focus:border-gray-300 is set to fix Firefox border color issue
+  */
+  .border-visible-base {
+    @apply border border-gray-300 bg-rtu-primary-bg
+    focus:border-gray-300
+    focus:outline-none
+    focus:ring-0
+    focus-visible:border-black
+    dark:border-[#575859]
+    focus-visible:dark:border-white;
+  }
+
+  .disabled-base {
+    @apply disabled:pointer-events-none
+    disabled:opacity-50;
+  }
+
+  .disabled-with-background-base {
+    @apply disabled-base
+    disabled:bg-gray-200
+    disabled:dark:bg-gray-600;
+  }
+
+  .button-base {
+    @apply ring-visible-base disabled-base min-h-9 
+    whitespace-nowrap  rounded-sm px-2 py-2 text-sm;
+  }
+
+  .button-ok {
+    @apply button-base bg-[#25c06d]
+    hover:bg-green-600
+    active:bg-green-700;
+  }
+
+  .button-cancel {
+    @apply button-base
+    bg-[#FF955C]
+    hover:bg-orange-500
+    active:bg-orange-600;
+  }
+
+  .button-delete {
+    @apply button-base
+    bg-red-400
+    hover:bg-red-500
+    active:bg-red-600;
+  }
+
+  .button-neutral {
+    @apply button-base
+    bg-stone-300
+    hover:bg-stone-400
+    active:bg-stone-400
+    dark:bg-zinc-600
+    dark:hover:bg-zinc-500
+    dark:active:bg-zinc-500;
+  }
+
+  .button-extra {
+    @apply button-base
+    bg-rtu-second-bg
+    hover:bg-stone-200
+    active:bg-stone-300
+    dark:bg-zinc-700
+    dark:hover:bg-zinc-600
+    dark:active:bg-zinc-500;
+  }
+
+  .button-extra-primary {
+    @apply button-base
+    bg-rtu-primary-bg
+    hover:bg-stone-200
+    active:bg-stone-300
+    dark:bg-rtu-dark-primary-bg
+    dark:hover:bg-zinc-700
+    dark:active:bg-zinc-600;
+  }
+
+  .menu-base {
+    @apply ring-visible-base disabled-base min-h-6 
+    whitespace-nowrap  rounded-sm px-2 py-0 text-sm;
+  }
+  .context-menu-line {
+    @apply menu-base
+    rounded-sm px-3 py-0.5 text-left text-xs  hover:bg-blue-300 hover:dark:bg-blue-500;
+  }
+
+  .alarm-minor {
+    @apply text-yellow-400
+    dark:text-yellow-300;
+  }
+
+  .alarm-major {
+    @apply text-orange-500
+    dark:text-orange-400;
+  }
+
+  .alarm-critical {
+    @apply text-red-500
+    dark:text-red-500;
+  }
+
+  .alarm-resolved {
+    @apply text-green-600
+    dark:text-green-500;
+  }
+
+  .alarm-off {
+    @apply text-gray-600 dark:text-zinc-400;
+  }
+
+  .input-simple {
+    @apply border-base disabled-with-background-base 
+    rounded-sm  text-sm 
+    dark:bg-rtu-dark-primary-bg;
+  }
+
+  .label-color {
+    @apply text-zinc-600 dark:text-zinc-400;
+  }
+
+  .input-label {
+    @apply border-base
+    rounded-sm px-3 pb-1.5 pt-2.5 text-sm 
+    focus-within:border-black 
+    focus-within:ring-0
+    dark:bg-rtu-dark-primary-bg
+    dark:focus-within:border-white;
+  }
+
+  /* 
+  :has aren't currently supported Firefox, we I hope it will be done soon
+  https://bugzilla.mozilla.org/show_bug.cgi?id=418039 
+  https://caniuse.com/?search=has
+  */
+  .input-label:has(input:disabled),
+  .input-label > input:disabled {
+    @apply pointer-events-none
+    bg-gray-200
+    opacity-50
+    dark:bg-gray-600;
+  }
+
+  .input-label > label {
+    @apply label-color block text-xs font-medium;
+  }
+
+  .input-label > input {
+    @apply w-full border-0 bg-rtu-primary-bg p-0 
+    text-sm
+    focus:ring-0
+    dark:bg-rtu-dark-primary-bg;
+  }
+
+  .input-2-label {
+    @apply rounded-sm bg-rtu-second-bg px-3 pb-1.5 pt-2.5 
+    text-sm
+    dark:bg-rtu-dark-second-bg;
+  }
+
+  /* 
+  :has aren't currently supported Firefox, we I hope it will be done soon
+  https://bugzilla.mozilla.org/show_bug.cgi?id=418039 
+  https://caniuse.com/?search=has
+  */
+  .input-2-label:has(input:disabled),
+  .input-2-label > input:disabled {
+    @apply pointer-events-none
+    bg-gray-200
+    opacity-50
+    dark:bg-gray-600;
+  }
+
+  .input-2-label > label {
+    @apply label-color block text-xs font-medium;
+  }
+
+  .input-2-label > input {
+    @apply w-full border-0 bg-rtu-second-bg p-0 
+    text-sm
+    focus:ring-0
+    dark:bg-rtu-dark-second-bg;
+  }
+
+  .combobox {
+    @apply background-base border-visible-base disabled-with-background-base
+    rounded-sm p-2 pr-8 text-sm;
+  }
+
+  .toggle.disabled-slider {
+    @apply cursor-default;
+    opacity: 50%;
+  }
+
+  .toggle.inaccessible-slider {
+    @apply cursor-default;
+  }
+
+  .headercell {
+    @apply border border-gray-200 px-1;
+  }
+  .gridcell {
+    @apply overflow-hidden whitespace-nowrap border border-gray-200 px-1;
+  }
+
+  .monospace {
+    font-family: 'Courier New', monospace;
+    font-size: 0.75rem;
+  }
+
+  .disabled-label {
+    color: gray;
+  }
+
+  .disabled-table {
+    opacity: 50%;
+  }
+
+  .sticky-table-header {
+    @apply sticky top-0 z-10 bg-rtu-primary-bg dark:bg-rtu-dark-primary-bg;
+  }
+
+  .events-table {
+    @apply min-w-full text-sm;
+
+    & thead {
+      @apply text-gray-600 dark:text-zinc-400;
+    }
+
+    & th {
+      @apply sticky-table-header pb-3 font-thin;
+    }
+
+    & tbody {
+      @apply text-gray-700 dark:text-zinc-300;
+    }
+
+    & tr {
+      @apply rounded-sm;
+    }
+
+    & tr:nth-child(odd) {
+      @apply bg-rtu-second-bg dark:bg-rtu-dark-second-bg;
+    }
+
+    & td {
+      @apply py-2;
+    }
+  }
+
+  .toggle {
+    @apply relative inline-flex cursor-pointer items-center;
+  }
+
+  .toggle > input {
+    @apply sr-only;
+  }
+
+  .toggle > input:checked + .slider {
+    @apply bg-[#6079F9];
+  }
+
+  /* Когда input задисейблен — меняем цвет/прозрачность слайдера */
+  .toggle > input:disabled + .slider {
+    @apply cursor-default opacity-50;
+  }
+
+  .toggle > input:checked + .slider::after {
+    @apply translate-x-full;
+  }
+
+  .toggle > input:focus:focus-visible + .slider {
+    @apply outline-none
+    ring-1 
+    ring-black 
+    ring-offset-1 
+    dark:ring-white 
+    dark:ring-offset-black;
+  }
+
+  .toggle > .slider {
+    @apply flex h-5 w-9 flex-shrink-0
+    items-center rounded-sm 
+    border-[0.125rem] border-transparent 
+    bg-gray-200 
+    dark:bg-gray-700;
+  }
+
+  .slider::after {
+    @apply absolute
+    h-4
+    w-4
+    rounded-sm
+    bg-white transition-all
+    content-[''];
+  }
+
+  .text-link-with-hover {
+    @apply text-blue-600 hover:text-blue-700 dark:text-blue-500 dark:hover:text-blue-600;
+  }
+
+  .hover-link {
+    @apply hover:text-blue-500 hover:dark:text-blue-500;
+  }
+
+  .available-action {
+    @apply hover-link m-1 flex w-14 shrink-0 cursor-pointer flex-col items-center text-sm;
+  }
+
+  .action-active {
+    @apply text-blue-500 dark:text-blue-500;
+  }
+
+  .action-non-active {
+    @apply text-zinc-600 dark:text-zinc-400;
+  }
+
+  .toggle-maintainance-on {
+    @apply text-orange-400 hover:text-orange-600 hover:dark:text-orange-700;
+  }
+
+  .toggle-monitoring-on {
+    @apply fill-green-400 text-green-400  hover:text-green-600 hover:dark:text-green-700;
+  }
+
+  .grouped-border {
+    @apply rounded-lg border border-gray-300 p-3 dark:border-[#575859];
+  }
+
+  .help-tooltip {
+    @apply mx-2 my-1 rounded-sm border border-gray-300 bg-gray-100 px-2 py-1 text-xs dark:border-[#575859] dark:bg-rtu-dark-second-bg;
+  }
+
+  .to-h-full-w-full-relative {
+    @apply relative flex flex-grow;
+  }
+
+  .to-h-full-w-full-absolute {
+    @apply absolute left-0 top-0 h-full w-full flex-grow;
+  }
+}
+
+/* cdk dialog */
+@import '@angular/cdk/overlay-prebuilt.css';
+
+.cdk-dialog-container {
+  outline: none;
+  overflow-y: auto;
+}
+
+.dialog {
+  @apply h-full w-full border border-gray-300 bg-rtu-primary-bg p-5 text-sm dark:border-[#575859] dark:bg-rtu-dark-primary-bg;
+}
+
+.my-dialog {
+  @apply h-full w-full border border-gray-300 bg-rtu-primary-bg text-sm dark:border-[#575859] dark:bg-rtu-dark-primary-bg;
+}
+
+.draggable-window {
+  @apply fixed left-0 top-0 flex flex-col border border-gray-300 bg-rtu-primary-bg px-1 pb-1 text-sm shadow-lg shadow-gray-700 dark:border-[#575859] dark:bg-rtu-dark-primary-bg;
+}
+
+.modal-backdrop {
+  @apply fixed inset-0 flex items-center justify-center bg-black bg-opacity-10;
+}
+
+/* scroll bar. Chrome, Edge, and Safari  */
+/* NOTE: Doesn't work in Firefox! */
+
+::-webkit-scrollbar {
+  width: 0.6rem;
+  height: 0.6rem;
+}
+
+::-webkit-scrollbar-track {
+  @apply rounded-[0.1rem] bg-gray-100;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply rounded-[0.1rem] border border-solid border-white bg-zinc-400 hover:bg-zinc-500;
+}
+
+.dark ::-webkit-scrollbar-track {
+  @apply bg-zinc-400;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  @apply border border-solid border-gray-200 bg-zinc-600 hover:bg-zinc-700;
+}
+
+/* @layer utilities  */
+@layer utilities {
+  .invalid-border {
+    @apply border-red-500
+     focus:border-red-500 
+     dark:border-red-500
+     dark:focus:border-red-500;
+  }
+
+  .text-data-highlight {
+    @apply text-gray-600
+     dark:text-zinc-400;
+  }
+}
+
+/* https://stackoverflow.com/questions/24980459/safari-input-file-doesnt-work */
+.hidden-input-fix-safari-bug {
+  width: 0px;
+  height: 0px;
+  overflow: hidden;
+}
+
+/* стили для компонента выбора даты */
+
+.rtu-date-picker-container {
+  .mat-mdc-form-field-infix {
+    @apply hidden;
+  }
+  .mat-mdc-text-field-wrapper {
+    @apply h-8
+    border-r-0
+    pl-0;
+  }
+  .mdc-line-ripple {
+    @apply hidden;
+  }
+  .mat-mdc-form-field-subscript-wrapper {
+    @apply hidden;
+  }
+  .mat-mdc-icon-button,
+  .mat-mdc-button-base {
+    padding: 0 !important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 32px;
+    width: 32px;
+  }
+  .mdc-icon-button {
+    border-radius: 0;
+  }
+  .mdc-icon-button:hover {
+    @apply rounded-none
+    bg-gray-100
+    dark:bg-gray-500;
+  }
+  .mat-mdc-button-touch-target {
+    height: 32px !important;
+    width: 32px !important;
+  }
+  .mat-mdc-button-ripple {
+    height: 32px !important;
+    width: 32px !important;
+  }
+  .mat-mdc-form-field-icon-suffix {
+    padding: 0;
+  }
+  .mat-mdc-form-field {
+    border: 1px solid rgb(229, 231, 235);
+    border-left: 0;
+    @apply dark:border-[#575859];
+  }
+  .mat-mdc-icon-button,
+  .mat-mdc-button-persistent-ripple :hover {
+    border-radius: 0;
+  }
+  .mat-mdc-icon-button,
+  .mat-mdc-button-persistent-ripple {
+    border-radius: 0 !important;
+  }
+  .mdc-text-field--filled:not(.mdc-text-field--disabled) {
+    @apply dark:bg-gray-500;
+  }
+  .mat-datepicker-toggle-default-icon {
+    @apply dark:text-gray-200;
+  }
+  .mdc-text-field {
+    @apply rounded-none;
+  }
+  .mdc-icon-button {
+    @apply background-base;
+  }
+}
+
+.mat-datepicker-content {
+  @apply dark:bg-rtu-dark-second-bg;
+}
+.mat-calendar-table-header {
+  @apply dark:text-white;
+}
+.mdc-button__label {
+  @apply dark:text-white;
+}
+.mat-calendar-arrow {
+  @apply dark:fill-white;
+}
+.mat-calendar-previous-button::after {
+  @apply dark:text-white;
+}
+.mat-calendar-next-button::after {
+  @apply dark:text-white;
+}
+.mat-calendar-body-cell-content {
+  @apply dark:text-white;
+}
+.mat-calendar-body-label {
+  @apply dark:text-white;
+}
