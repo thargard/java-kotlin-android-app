@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">Приложение</string>
+    <string name="choose_language">Выберите язык</string>
+    <string name="follow_system">Язык системы</string>
+    <string name="log_reg">Войдите или Зарегистрируйтесь</string>
+    <string name="reg_acc">Регистрация Аккаунта</string>
+    <string name="login">Логин</string>
+    <string name="password">Пароль</string>
+    <string name="second_password">Повторите пароль</string>
+    <string name="full_name">Полное имя</string>
+    <string name="email">Электронная почта</string>
+    <string name="login_button">Войти</string>
+    <string name="register_button">Регистрация</string>
+    <string name="reg_acc_button">Завершить регистрацию</string>
+    <string name="network_error">Ошибка сети</string>
+    <string name="fill_fields_error_1">Пожалуйста введите логин и пароль!</string>
+    <string name="fill_fields_error_2">Заполните все поля для регистрации!</string>
+    <string name="password_mismatch_error">Пароли не совпадают!</string>
+    <string name="login_failed">Вход не удался </string>
+    <string name="registration_failed">Регистрация не удалась </string>
+    <string name="greetings">Приветствуем,</string>
+    <string name="logout">Выйти из аккаунта</string>
+</resources>

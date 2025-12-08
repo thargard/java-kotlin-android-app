@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">NewTestProject</string>
+    <string name="choose_language">Choose language</string>
+    <string name="follow_system">System language</string>
+    <string name="log_reg">Login or Register</string>
+    <string name="reg_acc">Register Account</string>
+    <string name="login">Login</string>
+    <string name="password">Password</string>
+    <string name="second_password">Repeat password</string>
+    <string name="full_name">Full name</string>
+    <string name="email">Email</string>
+    <string name="login_button">Login</string>
+    <string name="register_button">Register</string>
+    <string name="reg_acc_button">Submit registration</string>
+    <string name="network_error">Network error</string>
+    <string name="fill_fields_error_1">Please enter login and password!</string>
+    <string name="fill_fields_error_2">Fill all fields for registration!</string>
+    <string name="password_mismatch_error">Passwords do not match!</string>
+    <string name="login_failed">Login failed </string>
+    <string name="registration_failed">Registration failed </string>
+    <string name="greetings">Greetings,</string>
+    <string name="logout">Log out</string>
+</resources>
