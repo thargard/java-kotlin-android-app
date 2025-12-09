@@ -1,5 +1,6 @@
 <resources>
-    <string name="app_name">ArtizanHub</string>
+    <string name="default_web_client_id">1090006187412-1u3ojagta6f14jbj4pn6020jf0isamd7.apps.googleusercontent.com</string>
+    <string name="app_name">ArtisanHub</string>
     <string name="choose_language">Choose language</string>
     <string name="follow_system">System language</string>
     <string name="log_reg">Login or Register</string>
@@ -20,7 +21,11 @@
     <string name="registration_failed">Registration failed </string>
     <string name="greetings">Greetings,</string>
     <string name="logout">Log out</string>
-    <string name="welcome_title">Welcome to ArtizanHub</string>
+    <string name="google_sign_in">Sign in with Google</string>
+    <string name="google_sign_in_failed">Google sign-in failed</string>
+    <string name="google_token_missing">Google token missing</string>
+    <string name="google_auth_failed">Google auth failed </string>
+    <string name="welcome_title">Welcome to ArtisanHub</string>
     <string name="welcome_message">Briefly learn about the app, then log in or register to continue.</string>
     <string name="start_auth_button">Login or register</string>
 </resources>

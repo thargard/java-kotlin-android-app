@@ -1,5 +1,8 @@
 package com.example.newtestproject.screen
 
+import android.app.Activity
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -20,13 +23,20 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.example.newtestproject.R
 import com.example.newtestproject.RetrofitClient
 import com.example.newtestproject.model.ErrorResponse
+import com.example.newtestproject.model.GoogleLoginRequest
+import com.example.newtestproject.model.ServerAuthResponse
 import com.example.newtestproject.model.User
+import com.example.newtestproject.util.SessionPrefs
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
 import com.google.gson.Gson
 import retrofit2.Call
 import retrofit2.Callback
@@ -44,6 +54,75 @@ fun AuthScreen(
     var isRegisterMode by remember { mutableStateOf(false) }
     var fullName by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
+
+    val context = LocalContext.current
+    val activity = context as? Activity
+    val webClientId = stringResource(id = R.string.default_web_client_id)
+    val googleSignInClient = remember(webClientId) {
+        GoogleSignIn.getClient(
+            context,
+            GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .requestIdToken(webClientId)
+                .build()
+        )
+    }
+    val googleLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+        try {
+            val account = task.getResult(ApiException::class.java)
+            val idToken = account?.idToken
+            if (idToken.isNullOrBlank()) {
+                errorMessage = "Google token missing"
+                return@rememberLauncherForActivityResult
+            }
+
+
+            val dic = mapOf("token" to  idToken)
+            RetrofitClient.api.loginWithGoogle(dic)
+                .enqueue(object : Callback<ServerAuthResponse> {
+                    override fun onResponse(
+                        call: Call<ServerAuthResponse>,
+                        response: Response<ServerAuthResponse>
+                    ) {
+                        if (response.isSuccessful) {
+                            val body = response.body()
+                            if (body != null) {
+                                SessionPrefs.saveTokens(
+                                    context,
+                                    serverToken = body.token,
+                                    idToken = idToken
+                                )
+                            }
+                            val name = body?.fullName
+                                ?: account.displayName
+                                ?: account.email
+                                ?: account.id
+                                ?: login.ifBlank { "User" }
+                            onLoginSuccess(name)
+                        } else {
+                            val errorStr = response.errorBody()?.string()
+                            val parsedErr = try {
+                                Gson().fromJson(errorStr, ErrorResponse::class.java)
+                            } catch (_: Exception) {
+                                null
+                            }
+                            errorMessage = parsedErr?.error
+                                ?: ("Google auth failed " + (errorStr ?: response.code()
+                                .toString()))
+                        }
+                    }
+
+                    override fun onFailure(call: Call<ServerAuthResponse>, t: Throwable) {
+                        errorMessage = t.message ?: "Network error"
+                    }
+                })
+        } catch (ex: Exception) {
+            errorMessage = "Google sign-in failed"
+        }
+    }
 
     val passwordsFilled = password.isNotBlank() && repeatPassword.isNotBlank()
     val passwordsMatch = passwordsFilled && password == repeatPassword
@@ -145,14 +224,22 @@ fun AuthScreen(
                 secondPart = errorMessage.substringAfter(prefix).trim()
                 errorMessage = prefix
             }
+            if (errorMessage.startsWith("Google auth failed")){
+                val prefix = "Google auth failed"
+                secondPart = errorMessage.substringAfter(prefix).trim()
+                errorMessage = prefix
+            }
             Text(
                 when(errorMessage) {
                     "Please enter login and password!" -> stringResource(id = R.string.fill_fields_error_1)
                     "Fill all fields for registration!" -> stringResource(id = R.string.fill_fields_error_2)
                     "Network error" -> stringResource(id = R.string.network_error)
+                    "Google sign-in failed" -> stringResource(id = R.string.google_sign_in_failed)
+                    "Google token missing" -> stringResource(id = R.string.google_token_missing)
                     "Passwords do not match!" -> stringResource(id = R.string.password_mismatch_error)
                     "Login failed" -> stringResource(id = R.string.login_failed) + secondPart
                     "Registration failed" -> stringResource(id = R.string.registration_failed) + secondPart
+                    "Google auth failed" -> stringResource(id = R.string.google_auth_failed) + secondPart
                     else -> "unknown"
                 },
                 color = MaterialTheme.colorScheme.error
@@ -236,6 +323,23 @@ fun AuthScreen(
                 else
                     stringResource(id = R.string.reg_acc_button)
             )
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        OutlinedButton(
+            onClick = {
+                errorMessage = ""
+                val signInIntent = googleSignInClient.signInIntent
+                if (activity != null) {
+                    googleLauncher.launch(signInIntent)
+                } else {
+                    errorMessage = "Google sign-in failed"
+                }
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(text = stringResource(id = R.string.google_sign_in))
         }
     }
 }

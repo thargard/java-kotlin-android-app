@@ -20,8 +20,8 @@ import androidx.navigation.navDeepLink
 import com.example.newtestproject.components.LanguageButton
 import com.example.newtestproject.util.LanguageManager
 import com.example.newtestproject.util.LanguagePrefs
-import com.example.newtestproject.screen.FirstScreen
 import com.example.newtestproject.screen.AuthScreen
+import com.example.newtestproject.screen.FirstScreen
 import com.example.newtestproject.screen.GreetingScreen
 
 
