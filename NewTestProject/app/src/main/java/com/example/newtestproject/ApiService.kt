@@ -13,10 +13,10 @@ interface ApiService {
     fun greet(@Query("name") name: String): Call<String>
 
     @POST("/api/auth/register")
-    fun register(@Body user: User): Call<User>
+    fun register(@Body user: User): Call<String>
 
     @POST("/api/auth/login")
-    fun login(@Body credentials: Map<String, String>): Call<User>
+    fun login(@Body credentials: Map<String, String>): Call<String>
 
     @POST("/api/auth/google")
     fun loginWithGoogle(@Body request: Map<String, String>): Call<ServerAuthResponse>

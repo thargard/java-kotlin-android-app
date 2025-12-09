@@ -29,6 +29,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.example.newtestproject.R
 import com.example.newtestproject.RetrofitClient
+import com.example.newtestproject.components.EncodeJwt
 import com.example.newtestproject.model.ErrorResponse
 import com.example.newtestproject.model.GoogleLoginRequest
 import com.example.newtestproject.model.ServerAuthResponse
@@ -89,6 +90,7 @@ fun AuthScreen(
                     ) {
                         if (response.isSuccessful) {
                             val body = response.body()
+                            val payload = EncodeJwt(body?.token.toString())
                             if (body != null) {
                                 SessionPrefs.saveTokens(
                                     context,
@@ -96,7 +98,7 @@ fun AuthScreen(
                                     idToken = idToken
                                 )
                             }
-                            val name = body?.fullName
+                            val name = payload?.login
                                 ?: account.displayName
                                 ?: account.email
                                 ?: account.id
@@ -253,11 +255,12 @@ fun AuthScreen(
                     errorMessage = "Please enter login and password!"
                 } else {
                     val credentials = mapOf("login" to login, "password" to password)
-                    RetrofitClient.api.login(credentials).enqueue(object : Callback<User> {
-                        override fun onResponse(call: Call<User>, response: Response<User>) {
+                    RetrofitClient.api.login(credentials).enqueue(object : Callback<String> {
+                        override fun onResponse(call: Call<String>, response: Response<String>) {
                             if (response.isSuccessful) {
-                                val user = response.body()
-                                onLoginSuccess(user?.fullName ?: user?.login ?: login)
+                                val jwt = response.body()
+                                val payload = EncodeJwt(jwt ?: "")
+                                onLoginSuccess(payload?.login ?: login)
                             } else {
                                 val errorStr = response.errorBody()?.string()
                                 val parsedErr = try {
@@ -268,7 +271,7 @@ fun AuthScreen(
                                 errorMessage = parsedErr?.error ?: ("Login failed " + (errorStr ?: response.code().toString()))
                             }
                         }
-                        override fun onFailure(call: Call<User>, t: Throwable) {
+                        override fun onFailure(call: Call<String>, t: Throwable) {
                             errorMessage = t.message ?: "Network error"
                         }
                     })
@@ -293,11 +296,12 @@ fun AuthScreen(
                         errorMessage = "Passwords do not match!"
                     } else {
                         val user = User(login, password, email, fullName)
-                        RetrofitClient.api.register(user).enqueue(object : Callback<User> {
-                            override fun onResponse(call: Call<User>, response: Response<User>) {
+                        RetrofitClient.api.register(user).enqueue(object : Callback<String> {
+                            override fun onResponse(call: Call<String>, response: Response<String>) {
                                 if (response.isSuccessful) {
-                                    val newUser = response.body()
-                                    onRegisterSuccess(newUser?.fullName ?: newUser?.login ?: fullName)
+                                    val jwt = response.body()
+                                    val payload = EncodeJwt(jwt ?: "")
+                                    onRegisterSuccess(payload?.login ?: login)
                                 } else {
                                     val errorStr = response.errorBody()?.string()
                                     val parsedErr = try {
@@ -308,7 +312,7 @@ fun AuthScreen(
                                     errorMessage = parsedErr?.error ?: ("Registration failed " + (errorStr ?: response.code().toString()))
                                 }
                             }
-                            override fun onFailure(call: Call<User>, t: Throwable) {
+                            override fun onFailure(call: Call<String>, t: Throwable) {
                                 errorMessage = t.message ?: "Network error"
                             }
                         })

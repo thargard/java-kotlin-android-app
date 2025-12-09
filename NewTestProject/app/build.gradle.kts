@@ -87,4 +87,6 @@ dependencies {
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-auth-ktx")
     implementation("com.google.android.gms:play-services-auth:21.4.0")
+
+    implementation("com.auth0.android:jwtdecode:2.0.2")
 }
