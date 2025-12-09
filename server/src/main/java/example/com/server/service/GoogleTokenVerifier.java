@@ -4,7 +4,6 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -26,6 +25,6 @@ public class GoogleTokenVerifier {
         if (idToken == null) {
             throw new RuntimeException("Invalid Google ID token");
         }
-        return idToken.getPayload();
+         return idToken.getPayload();
     }
 }

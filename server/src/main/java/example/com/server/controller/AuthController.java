@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -35,9 +36,8 @@ public class AuthController {
     public ResponseEntity<?> register(@RequestBody User user) {
         try {
             User created = authService.register(user);
-            // объект который вернется клиенту, но типа здесь не должно быть пароля даже зашифрованного
-            created.setPassword(null); 
-            return ResponseEntity.status(HttpStatus.CREATED).body(created);
+            String jwt = jwtService.generateToken(created);
+            return ResponseEntity.status(HttpStatus.CREATED).body(jwt);
         } catch (IllegalArgumentException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("error", ex.getMessage()));
@@ -49,12 +49,13 @@ public class AuthController {
         String login = credentials.get("login");
         String password = credentials.get("password");
 
-        return authService.login(login, password)
-                .map(user -> {
-                    user.setPassword(null);
-                    return ResponseEntity.ok(user);
-                })
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
+        try {
+            Optional<User> user = authService.login(login, password);
+            String jwt = jwtService.generateToken(user.get());
+            return ResponseEntity.status(HttpStatus.OK).body(jwt);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        }
     }
 
     @GetMapping
@@ -69,10 +70,10 @@ public class AuthController {
         try {
             GoogleIdToken.Payload payload = verifier.verify(token);
             String email = payload.getEmail();
-            String name = (String) payload.get("name");
+            String login = (String) payload.get("name");
             String googleId = payload.getSubject();
 
-            User user = userService.createOrGetUser(email, name, googleId);
+            User user = userService.createOrGetUser(email, login, googleId);
 
             String jwt = jwtService.generateToken(user);
 

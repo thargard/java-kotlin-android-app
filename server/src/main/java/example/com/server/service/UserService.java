@@ -11,12 +11,12 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-    public User createOrGetUser(String email, String name, String googleId){
+    public User createOrGetUser(String email, String login, String googleId){
         return userRepository.findByEmail(email).orElseGet(() -> {
-            User u = new User();
-            u.setEmail(email);
-            u.setFullName(name);
-            return userRepository.save(u);
+           User u = new User();
+           u.setEmail(email);
+           u.setLogin(login);
+           return userRepository.save(u);
         });
     }
 }

@@ -10,13 +10,13 @@ import java.util.Date;
 @Service
 public class JwtService {
 
-    private final String secret = "your-secret-key-hello-your-secret-key-hello-your-secret-key-hello-your-secret-key-hello";
+    private final String secret = "your-secret-key-your-secret-key-your-secret-key-your-secret-key-your-secret-key-your-secret-key";
 
     public String generateToken(User user) {
         return Jwts.builder()
                 .setSubject(user.getEmail())
                 .claim("id", user.getId())
-                .claim("name", user.getFullName())
+                .claim("login", user.getLogin())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24))
                 .signWith(SignatureAlgorithm.HS256, secret.getBytes())
