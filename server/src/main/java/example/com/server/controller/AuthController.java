@@ -37,7 +37,7 @@ public class AuthController {
         try {
             User created = authService.register(user);
             String jwt = jwtService.generateToken(created);
-            return ResponseEntity.status(HttpStatus.CREATED).body(jwt);
+            return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("token", jwt));
         } catch (IllegalArgumentException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("error", ex.getMessage()));
@@ -52,7 +52,7 @@ public class AuthController {
         try {
             Optional<User> user = authService.login(login, password);
             String jwt = jwtService.generateToken(user.get());
-            return ResponseEntity.status(HttpStatus.OK).body(jwt);
+            return ResponseEntity.status(HttpStatus.OK).body(Map.of("token", jwt));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         }
