@@ -28,12 +28,13 @@ export class AuthService {
    * @param password пароль
    */
   login(username: string, password: string): Observable<LoginResponse> {
-    const loginRequest: LoginRequest = { username, password };
+    const loginRequest: LoginRequest = { login: username, password };
 
     return this.http
-      .post<LoginResponse>(`${environment.apiUrl}/login`, loginRequest)
+      .post<LoginResponse>(`${environment.apiUrl}/auth/login`, loginRequest)
       .pipe(
         tap((response) => {
+          console.log(response);
           // Сохраняем JWT токен
           if (response.token) {
             this.setToken(response.token);

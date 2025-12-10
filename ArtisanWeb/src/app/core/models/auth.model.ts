@@ -2,7 +2,7 @@
  * Модель для данных входа
  */
 export interface LoginRequest {
-  username: string;
+  login: string;
   password: string;
 }
 
