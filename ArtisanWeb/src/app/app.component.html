@@ -1,21 +1,44 @@
 <div class="flex flex-col items-center w-full mt-10 space-y-4">
-  <!-- Переключатель языков -->
-  <div class="flex gap-2 mb-4">
-    <button
-      (click)="switchLanguage('en')"
-      [class.font-bold]="currentLang === 'en'"
-      class="px-4 py-2 border rounded hover:bg-gray-100"
-    >
-      English
-    </button>
-    <button
-      (click)="switchLanguage('ru')"
-      [class.font-bold]="currentLang === 'ru'"
-      class="px-4 py-2 border rounded hover:bg-gray-100"
-    >
-      Русский
-    </button>
+  <!-- Header with Auth Buttons -->
+  <div class="w-full max-w-4xl flex justify-between items-center px-4 mb-4">
+    <div class="flex gap-2">
+      <button
+        (click)="switchLanguage('en')"
+        [class.font-bold]="currentLang === 'en'"
+        class="px-4 py-2 border rounded hover:bg-gray-100"
+      >
+        English
+      </button>
+      <button
+        (click)="switchLanguage('ru')"
+        [class.font-bold]="currentLang === 'ru'"
+        class="px-4 py-2 border rounded hover:bg-gray-100"
+      >
+        Русский
+      </button>
+    </div>
+
+    <!-- Auth Buttons -->
+    <div>
+      <button
+        *ngIf="!isAuthenticated"
+        (click)="navigateToLogin()"
+        class="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      >
+        Sign In
+      </button>
+      <button
+        *ngIf="isAuthenticated"
+        (click)="logout()"
+        class="px-6 py-2 bg-red-600 text-white rounded hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+      >
+        Logout
+      </button>
+    </div>
   </div>
+
+  <!-- Main Content -->
+  <router-outlet></router-outlet>
 
   <div>{{ "i18n.welcome" | translate }}</div>
   <div>{{ "i18n.title" | translate }}</div>

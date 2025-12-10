@@ -1,5 +1,15 @@
 {
   "i18n.title": "Artisan Web",
   "i18n.welcome": "Welcome to Artisan Web!",
-  "i18n.description": "This is a sample application with i18n support"
+  "i18n.description": "This is a sample application with i18n support",
+  "login.title": "Sign In",
+  "login.username": "Username",
+  "login.password": "Password",
+  "login.usernamePlaceholder": "Enter your username",
+  "login.passwordPlaceholder": "Enter your password",
+  "login.signInButton": "Sign In",
+  "login.cancelButton": "Cancel",
+  "login.loading": "Loading...",
+  "login.errorRequired": "Please enter username and password",
+  "login.errorFailed": "Login failed. Please try again."
 }

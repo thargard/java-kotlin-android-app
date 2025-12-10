@@ -1,5 +1,15 @@
 {
   "i18n.title": "Artisan Web",
   "i18n.welcome": "Добро пожаловать в Artisan Web!",
-  "i18n.description": "Это пример приложения с поддержкой i18n"
+  "i18n.description": "Это пример приложения с поддержкой i18n",
+  "login.title": "Вход в систему",
+  "login.username": "Имя пользователя",
+  "login.password": "Пароль",
+  "login.usernamePlaceholder": "Введите имя пользователя",
+  "login.passwordPlaceholder": "Введите пароль",
+  "login.signInButton": "Войти",
+  "login.cancelButton": "Отмена",
+  "login.loading": "Загрузка...",
+  "login.errorRequired": "Пожалуйста, введите имя пользователя и пароль",
+  "login.errorFailed": "Ошибка входа. Пожалуйста, попробуйте снова."
 }
