@@ -5,11 +5,11 @@ import retrofit2.converter.scalars.ScalarsConverterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitClient {
-    private const val BASE_URL = "http://192.168.0.108:8080/"
+    private val baseUrl: String = BuildConfig.BASE_URL
 
     val api: ApiService by lazy {
         Retrofit.Builder()
-            .baseUrl(BASE_URL)
+            .baseUrl(baseUrl)
             .addConverterFactory(ScalarsConverterFactory.create())
             .addConverterFactory(GsonConverterFactory.create())
             .build()
