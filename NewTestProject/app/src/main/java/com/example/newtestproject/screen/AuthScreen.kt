@@ -10,12 +10,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -25,15 +21,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.example.newtestproject.R
 import com.example.newtestproject.RetrofitClient
+import com.example.newtestproject.screen.authComponents.AuthErrorMessage
 import com.example.newtestproject.components.EncodeJwt
 import com.example.newtestproject.model.ErrorResponse
-import com.example.newtestproject.model.GoogleLoginRequest
 import com.example.newtestproject.model.ServerAuthResponse
 import com.example.newtestproject.model.User
+import com.example.newtestproject.screen.authComponents.*
 import com.example.newtestproject.util.SessionPrefs
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -141,126 +137,85 @@ fun AuthScreen(
             .padding(16.dp),
         verticalArrangement = Arrangement.Center
     ) {
-        Text(
-            if (!isRegisterMode) stringResource(id = R.string.log_reg) else stringResource(id = R.string.reg_acc),
-            style = MaterialTheme.typography.headlineMedium
-        )
+        AuthHeader(isRegisterMode)
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        OutlinedTextField(
+        LoginField(
             value = login,
             onValueChange = { login = it },
-            label = { Text(stringResource(id = R.string.login)) },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true
+            modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(16.dp))
 
         if (!isRegisterMode) {
-            OutlinedTextField(
+            PasswordField(
                 value = password,
                 onValueChange = { password = it },
-                label = { Text(stringResource(id = R.string.password)) },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true,
-                visualTransformation = PasswordVisualTransformation()
+                labelRes = R.string.password,
+                modifier = Modifier.fillMaxWidth()
             )
         } else {
-            OutlinedTextField(
+            PasswordField(
                 value = password,
                 onValueChange = { password = it },
-                label = { Text(stringResource(id = R.string.password)) },
+                labelRes = R.string.password,
                 modifier = Modifier.fillMaxWidth(),
-                singleLine = true,
-                visualTransformation = PasswordVisualTransformation(),
-                supportingText = {},
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = passwordSupportingColor,
                     unfocusedBorderColor = passwordSupportingColor
                 )
             )
             Spacer(modifier = Modifier.height(16.dp))
-            OutlinedTextField(
+            RepeatPasswordField(
                 value = repeatPassword,
                 onValueChange = { repeatPassword = it },
-                label = { Text(stringResource(id = R.string.second_password)) },
                 modifier = Modifier.fillMaxWidth(),
-                singleLine = true,
-                visualTransformation = PasswordVisualTransformation(),
-                supportingText = {},
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = passwordSupportingColor,
                     unfocusedBorderColor = passwordSupportingColor
                 )
             )
             Spacer(modifier = Modifier.height(16.dp))
-            OutlinedTextField(
+            FullNameField(
                 value = fullName,
                 onValueChange = { fullName = it },
-                label = { Text(stringResource(id = R.string.full_name)) },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true
+                modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(16.dp))
-            OutlinedTextField(
+            EmailField(
                 value = email,
                 onValueChange = { email = it },
-                label = { Text(stringResource(id = R.string.email)) },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true
+                modifier = Modifier.fillMaxWidth()
             )
         }
 
         Spacer(modifier = Modifier.height(24.dp))
 
+        AuthErrorMessage(errorMessage = errorMessage)
         if (errorMessage.isNotBlank()) {
-            var secondPart: String = ""
-            if (errorMessage.startsWith("Login failed")){
-                val prefix = "Login failed"
-                secondPart = errorMessage.substringAfter(prefix).trim()
-                errorMessage = prefix
-            }
-            if (errorMessage.startsWith("Registration failed")){
-                val prefix = "Registration failed"
-                secondPart = errorMessage.substringAfter(prefix).trim()
-                errorMessage = prefix
-            }
-            if (errorMessage.startsWith("Google auth failed")){
-                val prefix = "Google auth failed"
-                secondPart = errorMessage.substringAfter(prefix).trim()
-                errorMessage = prefix
-            }
-            Text(
-                when(errorMessage) {
-                    "Please enter login and password!" -> stringResource(id = R.string.fill_fields_error_1)
-                    "Fill all fields for registration!" -> stringResource(id = R.string.fill_fields_error_2)
-                    "Network error" -> stringResource(id = R.string.network_error)
-                    "Google sign-in failed" -> stringResource(id = R.string.google_sign_in_failed)
-                    "Google token missing" -> stringResource(id = R.string.google_token_missing)
-                    "Passwords do not match!" -> stringResource(id = R.string.password_mismatch_error)
-                    "Login failed" -> stringResource(id = R.string.login_failed) + secondPart
-                    "Registration failed" -> stringResource(id = R.string.registration_failed) + secondPart
-                    "Google auth failed" -> stringResource(id = R.string.google_auth_failed) + secondPart
-                    else -> "unknown"
-                },
-                color = MaterialTheme.colorScheme.error
-            )
             Spacer(modifier = Modifier.height(8.dp))
         }
 
-        Button(
+        LoginButton(
             onClick = {
                 if (login.isBlank() || password.isBlank()) {
                     errorMessage = "Please enter login and password!"
                 } else {
                     val credentials = mapOf("login" to login, "password" to password)
-                    RetrofitClient.api.login(credentials).enqueue(object : Callback<String> {
-                        override fun onResponse(call: Call<String>, response: Response<String>) {
+                    RetrofitClient.api.login(credentials).enqueue(object : Callback<ServerAuthResponse> {
+                        override fun onResponse(call: Call<ServerAuthResponse>, response: Response<ServerAuthResponse>) {
                             if (response.isSuccessful) {
-                                val jwt = response.body()
-                                val payload = EncodeJwt(jwt ?: "")
-                                onLoginSuccess(payload?.login ?: login)
+                                val body = response.body()
+                                val payload = EncodeJwt(body?.token.toString())
+                                if (body != null){
+                                    SessionPrefs.saveTokens(
+                                        context,
+                                        serverToken = body.token,
+                                        idToken = null
+                                    )
+                                }
+                                onLoginSuccess(payload?.login.toString())
                             } else {
                                 val errorStr = response.errorBody()?.string()
                                 val parsedErr = try {
@@ -271,7 +226,7 @@ fun AuthScreen(
                                 errorMessage = parsedErr?.error ?: ("Login failed " + (errorStr ?: response.code().toString()))
                             }
                         }
-                        override fun onFailure(call: Call<String>, t: Throwable) {
+                        override fun onFailure(call: Call<ServerAuthResponse>, t: Throwable) {
                             errorMessage = t.message ?: "Network error"
                         }
                     })
@@ -279,12 +234,12 @@ fun AuthScreen(
             },
             modifier = Modifier.fillMaxWidth(),
             enabled = !isRegisterMode
-        ) {
-            Text(stringResource(id = R.string.login_button))
-        }
+        )
         Spacer(modifier = Modifier.height(12.dp))
 
-        OutlinedButton(
+        RegisterButton(
+            isRegisterMode = isRegisterMode,
+            modifier = Modifier.fillMaxWidth(),
             onClick = {
                 if (!isRegisterMode) {
                     isRegisterMode = true
@@ -296,12 +251,19 @@ fun AuthScreen(
                         errorMessage = "Passwords do not match!"
                     } else {
                         val user = User(login, password, email, fullName)
-                        RetrofitClient.api.register(user).enqueue(object : Callback<String> {
-                            override fun onResponse(call: Call<String>, response: Response<String>) {
+                        RetrofitClient.api.register(user).enqueue(object : Callback<ServerAuthResponse> {
+                            override fun onResponse(call: Call<ServerAuthResponse>, response: Response<ServerAuthResponse>) {
                                 if (response.isSuccessful) {
-                                    val jwt = response.body()
-                                    val payload = EncodeJwt(jwt ?: "")
-                                    onRegisterSuccess(payload?.login ?: login)
+                                    val body = response.body()
+                                    val payload = EncodeJwt(body?.token.toString())
+                                    if(body != null) {
+                                        SessionPrefs.saveTokens(
+                                            context,
+                                            serverToken = body.token,
+                                            idToken = null
+                                        )
+                                    }
+                                    onRegisterSuccess(payload?.login.toString())
                                 } else {
                                     val errorStr = response.errorBody()?.string()
                                     val parsedErr = try {
@@ -312,26 +274,19 @@ fun AuthScreen(
                                     errorMessage = parsedErr?.error ?: ("Registration failed " + (errorStr ?: response.code().toString()))
                                 }
                             }
-                            override fun onFailure(call: Call<String>, t: Throwable) {
+                            override fun onFailure(call: Call<ServerAuthResponse>, t: Throwable) {
                                 errorMessage = t.message ?: "Network error"
                             }
                         })
                     }
                 }
-            },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(
-                if (!isRegisterMode)
-                    stringResource(id = R.string.register_button)
-                else
-                    stringResource(id = R.string.reg_acc_button)
-            )
-        }
+            }
+        )
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        OutlinedButton(
+        GoogleSignInButton(
+            modifier = Modifier.fillMaxWidth(),
             onClick = {
                 errorMessage = ""
                 val signInIntent = googleSignInClient.signInIntent
@@ -340,10 +295,7 @@ fun AuthScreen(
                 } else {
                     errorMessage = "Google sign-in failed"
                 }
-            },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(text = stringResource(id = R.string.google_sign_in))
-        }
+            }
+        )
     }
 }
