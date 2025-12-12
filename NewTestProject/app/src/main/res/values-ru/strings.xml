@@ -28,4 +28,9 @@
     <string name="welcome_title">Добро пожаловать в ArtisanHub</string>
     <string name="welcome_message">Коротко о приложении: войдите или зарегистрируйтесь, чтобы продолжить.</string>
     <string name="start_auth_button">Перейти к входу или регистрации</string>
+    <string name="role">Роль</string>
+    <string name="select_role">Выберите роль</string>
+    <string name="role_freelancer">Производитель</string>
+    <string name="role_customer">Заказчик</string>
+    <string name="role_admin">Администратор</string>
 </resources>

@@ -7,9 +7,11 @@ fun EncodeJwt(token: String): JwtPayload? {
     try {
         val jwt = JWT(token)
         val userLogin = jwt.getClaim("login").asString()
+        val userRole = jwt.getClaim("role").asString()
         val userEmail = jwt.subject
         return JwtPayload(
             login = userLogin.toString(),
+            role = userRole.toString(),
             email = userEmail.toString()
         )
     }catch (e:Exception){

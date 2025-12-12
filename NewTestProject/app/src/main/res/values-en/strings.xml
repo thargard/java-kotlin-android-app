@@ -28,4 +28,9 @@
     <string name="welcome_title">Welcome to ArtisanHub</string>
     <string name="welcome_message">Briefly learn about the app, then log in or register to continue.</string>
     <string name="start_auth_button">Login or register</string>
+    <string name="role">Role</string>
+    <string name="select_role">Select role</string>
+    <string name="role_freelancer">Producer</string>
+    <string name="role_customer">Customer</string>
+    <string name="role_admin">Admin</string>
 </resources>

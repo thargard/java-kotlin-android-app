@@ -51,6 +51,7 @@ fun AuthScreen(
     var isRegisterMode by remember { mutableStateOf(false) }
     var fullName by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
+    var selectedRole by remember { mutableStateOf<String?>(null) }
 
     val context = LocalContext.current
     val activity = context as? Activity
@@ -188,6 +189,12 @@ fun AuthScreen(
                 onValueChange = { email = it },
                 modifier = Modifier.fillMaxWidth()
             )
+            Spacer(modifier = Modifier.height(16.dp))
+            RoleSelectionField(
+                selectedRole = selectedRole,
+                onRoleSelected = { selectedRole = it },
+                modifier = Modifier.fillMaxWidth()
+            )
         }
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -244,13 +251,14 @@ fun AuthScreen(
                 if (!isRegisterMode) {
                     isRegisterMode = true
                     errorMessage = ""
+                    selectedRole = null
                 } else {
-                    if (login.isBlank() || password.isBlank() || fullName.isBlank() || email.isBlank() || repeatPassword.isBlank()) {
+                    if (login.isBlank() || password.isBlank() || fullName.isBlank() || email.isBlank() || repeatPassword.isBlank() || selectedRole == null) {
                         errorMessage = "Fill all fields for registration!"
                     } else if (password != repeatPassword) {
                         errorMessage = "Passwords do not match!"
                     } else {
-                        val user = User(login, password, email, fullName)
+                        val user = User(login, password, email, fullName, selectedRole)
                         RetrofitClient.api.register(user).enqueue(object : Callback<ServerAuthResponse> {
                             override fun onResponse(call: Call<ServerAuthResponse>, response: Response<ServerAuthResponse>) {
                                 if (response.isSuccessful) {
