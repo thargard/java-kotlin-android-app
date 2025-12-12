@@ -1,6 +1,7 @@
 package example.com.server.controller;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.gson.Gson;
 import example.com.server.model.User;
 import example.com.server.service.AuthService;
 import example.com.server.service.GoogleTokenVerifier;
@@ -12,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -23,6 +25,7 @@ public class AuthController {
     private final GoogleTokenVerifier verifier;
     private final UserService userService;
     private final JwtService jwtService;
+    private final Gson gson = new Gson();
 
     @Autowired
     public AuthController(AuthService authService, GoogleTokenVerifier verifier, UserService userService, JwtService jwtService) {
@@ -52,7 +55,10 @@ public class AuthController {
         try {
             Optional<User> user = authService.login(login, password);
             String jwt = jwtService.generateToken(user.get());
-            return ResponseEntity.status(HttpStatus.OK).body(Map.of("token", jwt));
+            Map<String, String> response = new HashMap<>();
+            response.put("token", jwt);
+            response.put("user", gson.toJson(user.get()));
+            return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         }
@@ -77,7 +83,11 @@ public class AuthController {
 
             String jwt = jwtService.generateToken(user);
 
-            return ResponseEntity.ok(Map.of("token", jwt));
+            Map<String, String> response = new HashMap<>();
+            response.put("token", jwt);
+            response.put("user", gson.toJson(user));
+
+            return ResponseEntity.ok(response);
         }catch(Exception e){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }

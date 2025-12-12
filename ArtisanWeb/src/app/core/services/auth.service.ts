@@ -55,6 +55,76 @@ export class AuthService {
   }
 
   /**
+   * Вход пользователя в систему через Google OAuth
+   */
+  googleLogin(idToken: string): Observable<LoginResponse> {
+    return this.http
+      .post<LoginResponse>(
+        `${environment.apiUrl}/auth/google`,
+        { token: idToken },
+        { headers: { 'Content-Type': 'application/json' } }
+      )
+      .pipe(
+        tap((response) => {
+          console.log(response);
+          // Сохраняем JWT токен
+          if (response.token) {
+            this.setToken(response.token);
+          }
+
+          // Сохраняем refresh token если есть
+          if (response.refreshToken) {
+            this.setRefreshToken(response.refreshToken);
+          }
+
+          // Сохраняем данные пользователя
+          if (response.user) {
+            this.setCurrentUser(response.user);
+            this.currentUserSubject.next(response.user);
+          }
+        })
+      );
+  }
+
+  /**
+   * Регистрация нового пользователя
+   * @param registrationData данные регистрации
+   */
+  register(registrationData: {
+    login: string;
+    email: string;
+    password: string;
+    fullName: string;
+    role: string;
+  }): Observable<LoginResponse> {
+    return this.http
+      .post<LoginResponse>(
+        `${environment.apiUrl}/auth/register`,
+        registrationData
+      )
+      .pipe(
+        tap((response) => {
+          console.log('Registration response', response);
+          // Сохраняем JWT токен
+          if (response.token) {
+            this.setToken(response.token);
+          }
+
+          // Сохраняем refresh token если есть
+          if (response.refreshToken) {
+            this.setRefreshToken(response.refreshToken);
+          }
+
+          // Сохраняем данные пользователя
+          if (response.user) {
+            this.setCurrentUser(response.user);
+            this.currentUserSubject.next(response.user);
+          }
+        })
+      );
+  }
+
+  /**
    * Выход пользователя из системы
    */
   logout(): void {

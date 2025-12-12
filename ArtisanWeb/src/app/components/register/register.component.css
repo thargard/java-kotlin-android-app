@@ -1,0 +1,9 @@
+/* Register component styles */
+
+:host ::ng-deep html,
+:host ::ng-deep body,
+:host ::ng-deep .min-h-screen {
+  height: 100vh;
+  min-height: 100vh;
+  overflow-y: auto;
+}

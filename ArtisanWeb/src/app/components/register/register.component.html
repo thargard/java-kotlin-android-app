@@ -1,0 +1,228 @@
+<div class="min-h-screen flex items-center justify-center bg-gray-100">
+  <div
+    class="bg-white p-8 rounded-lg shadow-md w-full max-w-md max-h-[90vh] overflow-y-auto"
+  >
+    <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">
+      {{ "register.title" | translate }}
+    </h2>
+
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="space-y-4">
+      <!-- Username Input -->
+      <div>
+        <label
+          for="username"
+          class="block text-sm font-medium text-gray-700 mb-1"
+        >
+          {{ "register.username" | translate }}
+        </label>
+        <input
+          type="text"
+          id="username"
+          formControlName="username"
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          [placeholder]="'register.usernamePlaceholder' | translate"
+          [disabled]="isLoading"
+          required
+        />
+        <div
+          *ngIf="
+            registerForm.get('username')?.invalid &&
+            registerForm.get('username')?.touched
+          "
+          class="text-red-500 text-sm mt-1"
+        >
+          {{ "register.errorUsernameInvalid" | translate }}
+        </div>
+      </div>
+
+      <!-- Full Name Input -->
+      <div>
+        <label
+          for="fullName"
+          class="block text-sm font-medium text-gray-700 mb-1"
+        >
+          {{ "register.fullName" | translate }}
+        </label>
+        <input
+          type="text"
+          id="fullName"
+          formControlName="fullName"
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          [placeholder]="'register.fullNamePlaceholder' | translate"
+          [disabled]="isLoading"
+          required
+        />
+        <div
+          *ngIf="
+            registerForm.get('fullName')?.invalid &&
+            registerForm.get('fullName')?.touched
+          "
+          class="text-red-500 text-sm mt-1"
+        >
+          {{ "register.errorFullNameInvalid" | translate }}
+        </div>
+      </div>
+
+      <!-- Email Input -->
+      <div>
+        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">
+          {{ "register.email" | translate }}
+        </label>
+        <input
+          type="email"
+          id="email"
+          formControlName="email"
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          [placeholder]="'register.emailPlaceholder' | translate"
+          [disabled]="isLoading"
+          required
+        />
+        <div
+          *ngIf="
+            registerForm.get('email')?.invalid &&
+            registerForm.get('email')?.touched
+          "
+          class="text-red-500 text-sm mt-1"
+        >
+          {{ "register.errorEmailInvalid" | translate }}
+        </div>
+      </div>
+
+      <!-- Password Input -->
+      <div>
+        <label
+          for="password"
+          class="block text-sm font-medium text-gray-700 mb-1"
+        >
+          {{ "register.password" | translate }}
+        </label>
+        <input
+          type="password"
+          id="password"
+          formControlName="password"
+          (input)="checkPasswordsMatch()"
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          [placeholder]="'register.passwordPlaceholder' | translate"
+          [disabled]="isLoading"
+          required
+        />
+        <div
+          *ngIf="
+            registerForm.get('password')?.invalid &&
+            registerForm.get('password')?.touched
+          "
+          class="text-red-500 text-sm mt-1"
+        >
+          {{ "register.errorPasswordInvalid" | translate }}
+        </div>
+      </div>
+
+      <!-- Confirm Password Input -->
+      <div>
+        <label
+          for="confirmPassword"
+          class="block text-sm font-medium text-gray-700 mb-1"
+        >
+          {{ "register.confirmPassword" | translate }}
+        </label>
+        <input
+          type="password"
+          id="confirmPassword"
+          formControlName="confirmPassword"
+          (input)="checkPasswordsMatch()"
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          [placeholder]="'register.confirmPasswordPlaceholder' | translate"
+          [disabled]="isLoading"
+          required
+        />
+        <div *ngIf="!passwordsMatch" class="text-red-500 text-sm mt-1">
+          {{ "register.errorPasswordsMismatch" | translate }}
+        </div>
+      </div>
+
+      <!-- Role Selection -->
+      <div class="border-t border-b py-4 my-4">
+        <p class="text-sm font-medium text-gray-700 mb-3">
+          {{ "register.selectRole" | translate }}
+        </p>
+
+        <!-- Customer Role -->
+        <div class="flex items-center mb-3">
+          <input
+            type="radio"
+            id="roleCustomer"
+            value="CUSTOMER"
+            formControlName="role"
+            class="h-4 w-4 text-blue-500"
+            [disabled]="isLoading"
+          />
+          <label
+            for="roleCustomer"
+            class="ml-2 text-sm text-gray-700 cursor-pointer"
+          >
+            {{ "register.roleCustomer" | translate }}
+          </label>
+        </div>
+
+        <!-- Creator/Artisan Role -->
+        <div class="flex items-center">
+          <input
+            type="radio"
+            id="roleArtisan"
+            value="PRODUCER"
+            formControlName="role"
+            class="h-4 w-4 text-blue-500"
+            [disabled]="isLoading"
+          />
+          <label
+            for="roleArtisan"
+            class="ml-2 text-sm text-gray-700 cursor-pointer"
+          >
+            {{ "register.roleArtisan" | translate }}
+          </label>
+        </div>
+      </div>
+
+      <!-- Error Message -->
+      <div
+        *ngIf="errorMessage"
+        class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative"
+        role="alert"
+      >
+        {{ errorMessage }}
+      </div>
+
+      <!-- Submit and Cancel Buttons -->
+      <div class="flex gap-3 pt-4">
+        <button
+          type="submit"
+          [disabled]="isLoading || registerForm.invalid || !passwordsMatch"
+          class="flex-1 bg-blue-500 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-600 disabled:bg-gray-400 transition duration-200"
+        >
+          <span *ngIf="!isLoading">{{
+            "register.registerButton" | translate
+          }}</span>
+          <span *ngIf="isLoading">{{ "register.loading" | translate }}</span>
+        </button>
+        <button
+          type="button"
+          (click)="onCancel()"
+          [disabled]="isLoading"
+          class="flex-1 bg-gray-500 text-white font-bold py-2 px-4 rounded-md hover:bg-gray-600 disabled:bg-gray-400 transition duration-200"
+        >
+          {{ "register.cancelButton" | translate }}
+        </button>
+      </div>
+    </form>
+
+    <!-- Link to Login -->
+    <div class="text-center mt-4">
+      <p class="text-sm text-gray-600">
+        {{ "register.haveAccount" | translate }}
+        <a href="/login" class="text-blue-500 hover:text-blue-700 font-medium">
+          {{ "register.goToLogin" | translate }}
+        </a>
+      </p>
+    </div>
+  </div>
+</div>
