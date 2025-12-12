@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -135,8 +137,9 @@ fun AuthScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Center
+            .padding(16.dp)
+            .verticalScroll(rememberScrollState()),
+        verticalArrangement = if (isRegisterMode) Arrangement.Top else Arrangement.Center
     ) {
         AuthHeader(isRegisterMode)
 
@@ -305,5 +308,9 @@ fun AuthScreen(
                 }
             }
         )
+
+        if (isRegisterMode) {
+            Spacer(modifier = Modifier.height(32.dp))
+        }
     }
 }
