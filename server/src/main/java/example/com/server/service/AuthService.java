@@ -27,7 +27,11 @@ public class AuthService {
             throw new IllegalArgumentException("User with this login already exists");
         }
 
-        // Hash the password before saving
+        // Set default role if not set
+        if (user.getRole() == null) {
+            user.setRole(User.Role.CUSTOMER);
+        }
+
         String hashedPassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(hashedPassword);
 

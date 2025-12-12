@@ -16,6 +16,7 @@ public class UserService {
            User u = new User();
            u.setEmail(email);
            u.setLogin(login);
+           u.setRole(User.Role.CUSTOMER); // default role is customer
            return userRepository.save(u);
         });
     }
