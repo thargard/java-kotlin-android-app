@@ -34,7 +34,6 @@ export class AuthService {
       .post<LoginResponse>(`${environment.apiUrl}/auth/login`, loginRequest)
       .pipe(
         tap((response) => {
-          console.log(response);
           // Сохраняем JWT токен
           if (response.token) {
             this.setToken(response.token);

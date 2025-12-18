@@ -1,9 +1,9 @@
 <div
-  *ngIf="username"
+  *ngIf="login"
   class="flex flex-col items-center justify-center min-h-[60vh]"
 >
   <h1 class="text-3xl font-bold mb-4">
-    {{ "home.greeting" | translate : { username: username } }}
+    {{ "home.greeting" | translate : { login: login } }}
   </h1>
   <p class="text-lg text-gray-600">
     {{ "home.roleText" | translate : { role: role } }}

@@ -15,9 +15,11 @@ export interface LoginResponse {
   expiresIn?: number;
   user?: {
     id: number;
-    username: string;
+    fullName?: string;
+    login: string; // username
     email?: string;
-    roles?: string[];
+    password?: string;
+    role: string;
   };
 }
 
@@ -26,7 +28,9 @@ export interface LoginResponse {
  */
 export interface User {
   id: number;
-  username: string;
+  fullName?: string;
+  login: string; // username
   email?: string;
-  roles?: string[];
+  password?: string;
+  role: string;
 }

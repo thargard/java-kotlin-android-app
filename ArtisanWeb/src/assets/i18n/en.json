@@ -39,7 +39,7 @@
   "register.haveAccount": "Already have an account?",
   "register.goToLogin": "Sign In here",
   "main.signUpButton": "Sign Up",
-  "home.greeting": "Hello, {{username}}!",
+  "home.greeting": "Hello, {{login}}!",
   "home.roleText": "Your role: {{role}}",
   "home.welcomeText": "Welcome to the main page.",
   "home.logoutButton": "Log Out"

@@ -39,7 +39,7 @@
   "register.haveAccount": "Уже есть учетная запись?",
   "register.goToLogin": "Войти здесь",
   "main.signUpButton": "Зарегистрироваться",
-  "home.greeting": "Привет, {{username}}!",
+  "home.greeting": "Привет, {{login}}!",
   "home.roleText": "Ваша роль: {{role}}",
   "home.welcomeText": "Добро пожаловать на главную страницу.",
   "home.logoutButton": "Выйти"
