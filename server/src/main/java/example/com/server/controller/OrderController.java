@@ -3,10 +3,12 @@ package example.com.server.controller;
 import example.com.server.model.Order;
 import example.com.server.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
@@ -42,8 +44,14 @@ public class OrderController {
     }
 
     @GetMapping
-    public List<Order> getAllOrders() {
-        return orderService.findAll();
+    public List<Order> getOrders(
+            @RequestParam(required = false) Long userId,
+            @RequestParam(required = false) Order.Status status,
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant createdAfter,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant createdBefore,
+            @RequestParam(required = false) String sort) {
+        return orderService.findOrders(userId, status, search, createdAfter, createdBefore, sort);
     }
 
     @GetMapping("/{id}")
