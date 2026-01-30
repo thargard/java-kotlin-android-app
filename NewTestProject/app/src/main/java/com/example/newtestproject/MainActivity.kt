@@ -23,6 +23,7 @@ import com.example.newtestproject.util.LanguagePrefs
 import com.example.newtestproject.screen.AuthScreen
 import com.example.newtestproject.screen.FirstScreen
 import com.example.newtestproject.screen.GreetingScreen
+import com.example.newtestproject.screen.OrdersScreen
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -61,14 +62,21 @@ class MainActivity : AppCompatActivity() {
                     composable("auth") {
                         AuthScreen(
                             onLoginSuccess = { fullName ->
-                                navController.navigate("greeting/${Uri.encode(fullName)}") {
+                                navController.navigate("orders") {
                                     popUpTo("first") { inclusive = false }
                                 }
                             },
                             onRegisterSuccess = { fullName ->
-                                navController.navigate("greeting/${Uri.encode(fullName)}") {
+                                navController.navigate("orders") {
                                     popUpTo("first") { inclusive = false }
                                 }
+                            }
+                        )
+                    }
+                    composable("orders") {
+                        OrdersScreen(
+                            onLogout = {
+                                navController.popBackStack("first", inclusive = false)
                             }
                         )
                     }
