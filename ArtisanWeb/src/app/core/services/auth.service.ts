@@ -176,6 +176,36 @@ export class AuthService {
   }
 
   /**
+   * Загрузить профиль текущего пользователя с сервера (GET /api/auth/me).
+   * После успешной загрузки обновляет currentUser в localStorage и в currentUser$.
+   */
+  fetchCurrentUserProfile(): Observable<User> {
+    return this.http.get<User>(`${environment.apiUrl}/auth/me`).pipe(
+      tap((user) => {
+        this.setCurrentUser(user);
+        this.currentUserSubject.next(user);
+      })
+    );
+  }
+
+  /**
+   * Обновить профиль текущего пользователя (PATCH /api/auth/me).
+   * После успешного обновления обновляет currentUser в localStorage и в currentUser$.
+   */
+  updateProfile(profile: {
+    fullName?: string;
+    login?: string;
+    email?: string;
+  }): Observable<User> {
+    return this.http.patch<User>(`${environment.apiUrl}/auth/me`, profile).pipe(
+      tap((user) => {
+        this.setCurrentUser(user);
+        this.currentUserSubject.next(user);
+      })
+    );
+  }
+
+  /**
    * Получить текущего пользователя
    */
   getCurrentUser(): User | null {

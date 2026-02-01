@@ -1,0 +1,165 @@
+<div class="w-full max-w-4xl px-4 mx-auto">
+  <div class="mt-6 mb-6">
+    <h1 class="text-2xl font-semibold tracking-tight text-gray-900">
+      {{ "profile.title" | translate }}
+    </h1>
+    <p class="mt-1 text-sm text-gray-600">
+      {{ "profile.subtitle" | translate }}
+    </p>
+  </div>
+
+  <!-- Profile loading / error -->
+  <div *ngIf="loadingProfile" class="mb-6 p-6 bg-white border border-gray-200 rounded-xl shadow-sm">
+    <div class="animate-pulse space-y-3">
+      <div class="h-4 bg-gray-200 rounded w-2/3"></div>
+      <div class="h-4 bg-gray-200 rounded w-1/2"></div>
+    </div>
+  </div>
+
+  <div *ngIf="!loadingProfile && profileError" class="mb-6 p-6 bg-white border border-red-200 rounded-xl shadow-sm">
+    <div class="text-red-700 text-sm">{{ profileError }}</div>
+    <button
+      (click)="loadProfile()"
+      class="mt-3 px-3 py-2 text-sm font-medium rounded-lg bg-red-600 text-white hover:bg-red-700"
+    >
+      {{ "orders.retry" | translate }}
+    </button>
+  </div>
+
+  <!-- Profile card -->
+  <div *ngIf="!loadingProfile && user && !profileError" class="mb-8">
+    <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+      <div class="p-6 border-b border-gray-200 bg-gray-50/50">
+        <h2 class="text-lg font-medium text-gray-900 mb-4">
+          {{ "profile.infoTitle" | translate }}
+        </h2>
+
+        <ng-container *ngIf="!editMode">
+          <dl class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div>
+              <dt class="text-xs font-medium text-gray-500">{{ "register.fullName" | translate }}</dt>
+              <dd class="mt-1 text-sm text-gray-900">{{ user.fullName || ("orders.emptyValue" | translate) }}</dd>
+            </div>
+            <div>
+              <dt class="text-xs font-medium text-gray-500">{{ "register.username" | translate }}</dt>
+              <dd class="mt-1 text-sm text-gray-900">{{ user.login }}</dd>
+            </div>
+            <div>
+              <dt class="text-xs font-medium text-gray-500">{{ "register.email" | translate }}</dt>
+              <dd class="mt-1 text-sm text-gray-900">{{ user.email || ("orders.emptyValue" | translate) }}</dd>
+            </div>
+            <div>
+              <dt class="text-xs font-medium text-gray-500">{{ "profile.role" | translate }}</dt>
+              <dd class="mt-1 text-sm text-gray-900">{{ roleLabel(user.role) }}</dd>
+            </div>
+          </dl>
+          <button
+            (click)="startEdit()"
+            class="mt-4 px-4 py-2 text-sm font-medium rounded-lg bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+          >
+            {{ "profile.edit" | translate }}
+          </button>
+        </ng-container>
+
+        <ng-container *ngIf="editMode">
+          <div class="space-y-4 max-w-md">
+            <label class="block">
+              <span class="block text-xs font-medium text-gray-600 mb-1">{{ "register.fullName" | translate }}</span>
+              <input
+                [(ngModel)]="editFullName"
+                type="text"
+                class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+              />
+            </label>
+            <label class="block">
+              <span class="block text-xs font-medium text-gray-600 mb-1">{{ "register.username" | translate }}</span>
+              <input
+                [(ngModel)]="editLogin"
+                type="text"
+                class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+              />
+            </label>
+            <label class="block">
+              <span class="block text-xs font-medium text-gray-600 mb-1">{{ "register.email" | translate }}</span>
+              <input
+                [(ngModel)]="editEmail"
+                type="email"
+                class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+              />
+            </label>
+            <div *ngIf="saveProfileError" class="text-sm text-red-600">{{ saveProfileError }}</div>
+            <div class="flex gap-2">
+              <button
+                (click)="saveProfile()"
+                [disabled]="savingProfile"
+                class="px-4 py-2 text-sm font-medium rounded-lg bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50"
+              >
+                {{ savingProfile ? ("profile.saving" | translate) : ("profile.save" | translate) }}
+              </button>
+              <button
+                (click)="cancelEdit()"
+                [disabled]="savingProfile"
+                class="px-4 py-2 text-sm font-medium rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50"
+              >
+                {{ "login.cancelButton" | translate }}
+              </button>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+
+  <!-- Portfolio (orders) -->
+  <div class="mb-8">
+    <h2 class="text-lg font-medium text-gray-900 mb-4">
+      {{ "profile.portfolioTitle" | translate }}
+    </h2>
+    <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+      <div *ngIf="loadingOrders" class="p-6">
+        <div class="animate-pulse space-y-3">
+          <div class="h-4 bg-gray-200 rounded w-2/3"></div>
+          <div class="h-4 bg-gray-200 rounded w-1/2"></div>
+        </div>
+      </div>
+      <div *ngIf="!loadingOrders && ordersError" class="p-6 text-red-700 text-sm">
+        {{ ordersError }}
+        <button (click)="loadOrders()" class="ml-3 px-3 py-2 text-sm font-medium rounded-lg bg-red-600 text-white hover:bg-red-700">
+          {{ "orders.retry" | translate }}
+        </button>
+      </div>
+      <div *ngIf="!loadingOrders && !ordersError && orders.length === 0" class="p-6 text-sm text-gray-600">
+        {{ "profile.portfolioEmpty" | translate }}
+      </div>
+      <div *ngIf="!loadingOrders && !ordersError && orders.length > 0" class="overflow-x-auto">
+        <table class="min-w-full text-sm">
+          <thead class="bg-white">
+            <tr class="text-left text-xs font-medium text-gray-600">
+              <th class="px-4 py-3 border-b border-gray-200">{{ "orders.tableId" | translate }}</th>
+              <th class="px-4 py-3 border-b border-gray-200">{{ "orders.tableStatus" | translate }}</th>
+              <th class="px-4 py-3 border-b border-gray-200">{{ "orders.tableDescription" | translate }}</th>
+              <th class="px-4 py-3 border-b border-gray-200">{{ "orders.tableCreated" | translate }}</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            <tr *ngFor="let order of orders" class="hover:bg-gray-50/70">
+              <td class="px-4 py-3 text-gray-900 font-medium">#{{ order.id }}</td>
+              <td class="px-4 py-3">
+                <span
+                  class="inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-medium"
+                  [ngClass]="statusBadgeClass(order.status)"
+                >
+                  {{ statusLabel(order.status) }}
+                </span>
+              </td>
+              <td class="px-4 py-3 text-gray-700 max-w-xs truncate" [title]="order.description || ''">
+                {{ order.description || ("orders.emptyValue" | translate) }}
+              </td>
+              <td class="px-4 py-3 text-gray-600 whitespace-nowrap">{{ order.createdAt | date : "medium" }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

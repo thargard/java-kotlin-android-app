@@ -72,5 +72,20 @@
   "orders.tableStatus": "Статус",
   "orders.tableDescription": "Описание",
   "orders.tableCreated": "Создан",
-  "orders.emptyValue": "—"
+  "orders.emptyValue": "—",
+  "profile.cabinetButton": "Личный кабинет",
+  "profile.title": "Личный кабинет",
+  "profile.subtitle": "Ваш профиль и портфолио заказов",
+  "profile.infoTitle": "Информация о профиле",
+  "profile.edit": "Редактировать",
+  "profile.save": "Сохранить",
+  "profile.saving": "Сохранение…",
+  "profile.errorLoad": "Не удалось загрузить профиль.",
+  "profile.errorSave": "Не удалось сохранить профиль.",
+  "profile.role": "Роль",
+  "profile.rolePRODUCER": "Исполнитель",
+  "profile.roleCUSTOMER": "Заказчик",
+  "profile.roleADMIN": "Администратор",
+  "profile.portfolioTitle": "Портфолио (ваши заказы)",
+  "profile.portfolioEmpty": "У вас пока нет заказов."
 }

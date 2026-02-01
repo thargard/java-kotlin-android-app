@@ -72,5 +72,20 @@
   "orders.tableStatus": "Status",
   "orders.tableDescription": "Description",
   "orders.tableCreated": "Created",
-  "orders.emptyValue": "—"
+  "orders.emptyValue": "—",
+  "profile.cabinetButton": "Personal account",
+  "profile.title": "Personal account",
+  "profile.subtitle": "Your profile and portfolio of orders",
+  "profile.infoTitle": "Profile information",
+  "profile.edit": "Edit",
+  "profile.save": "Save",
+  "profile.saving": "Saving…",
+  "profile.errorLoad": "Failed to load profile.",
+  "profile.errorSave": "Failed to save profile.",
+  "profile.role": "Role",
+  "profile.rolePRODUCER": "Producer",
+  "profile.roleCUSTOMER": "Customer",
+  "profile.roleADMIN": "Admin",
+  "profile.portfolioTitle": "Portfolio (your orders)",
+  "profile.portfolioEmpty": "You have no orders yet."
 }

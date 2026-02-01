@@ -50,6 +50,10 @@ export class AppComponent implements OnInit {
     this.router.navigate(['/register']);
   }
 
+  navigateToProfile() {
+    this.router.navigate(['/profile']);
+  }
+
   logout() {
     this.authService.logout();
     this.router.navigate(['/']);
