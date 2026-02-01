@@ -33,4 +33,15 @@
     <string name="role_freelancer">Производитель</string>
     <string name="role_customer">Заказчик</string>
     <string name="role_admin">Администратор</string>
+    <string name="order">Заказ</string>
+    <string name="pendingStatus">ОЖИДАЕТ</string>
+    <string name="completedStatus">ЗАВЕРШЕН</string>
+    <string name="in_progressStatus">В РАБОТЕ</string>
+    <string name="confirmedStatus">ПОДТВЕРЖДЕН</string>
+    <string name="cancelledStatus">ОТМЕНЕН</string>
+    <string name="user">Пользователь</string>
+    <string name="createdAt">Создан</string>
+    <string name="allOrders">Все заказы</string>
+    <string name="noOrders">Заказов пока нет</string>
+    <string name="unknownError">Неизвестная ошибка</string>
 </resources>

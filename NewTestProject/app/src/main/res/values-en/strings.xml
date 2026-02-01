@@ -33,4 +33,15 @@
     <string name="role_freelancer">Producer</string>
     <string name="role_customer">Customer</string>
     <string name="role_admin">Admin</string>
+    <string name="order">Order</string>
+    <string name="pendingStatus">PENDING</string>
+    <string name="completedStatus">COMPLETED</string>
+    <string name="in_progressStatus">IN PROGRESS</string>
+    <string name="confirmedStatus">CONFIRMED</string>
+    <string name="cancelledStatus">CANCELLED</string>
+    <string name="user">User</string>
+    <string name="createdAt">Created at</string>
+    <string name="allOrders">All orders</string>
+    <string name="noOrders">There are no orders</string>
+    <string name="unknownError">Unknown error</string>
 </resources>
