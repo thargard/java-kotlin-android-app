@@ -7,6 +7,7 @@ import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface ApiService {
@@ -24,4 +25,7 @@ interface ApiService {
 
     @GET("/api/orders")
     fun getAllOrders(): Call<List<Order>>
+
+    @GET("/api/orders/user/{userId}")
+    fun getOrdersByUser(@Path("userId") userId: Long): Call<List<Order>>
 }

@@ -44,4 +44,6 @@
     <string name="allOrders">All orders</string>
     <string name="noOrders">There are no orders</string>
     <string name="unknownError">Unknown error</string>
+    <string name="personal_cabinet">Personal cabinet</string>
+    <string name="my_orders">My orders</string>
 </resources>

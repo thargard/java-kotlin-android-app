@@ -1,4 +1,4 @@
-package com.example.newtestproject.components
+package com.example.newtestproject.screen.screenComponents
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.*
@@ -11,6 +11,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import com.example.newtestproject.R
+import com.example.newtestproject.components.currentActivity
 import com.example.newtestproject.util.LanguageManager
 
 @Composable

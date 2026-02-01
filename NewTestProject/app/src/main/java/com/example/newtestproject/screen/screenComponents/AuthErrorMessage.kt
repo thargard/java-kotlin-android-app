@@ -1,4 +1,4 @@
-package com.example.newtestproject.screen.authComponents
+package com.example.newtestproject.screen.screenComponents
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text

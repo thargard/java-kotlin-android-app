@@ -26,12 +26,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.newtestproject.R
 import com.example.newtestproject.RetrofitClient
-import com.example.newtestproject.screen.authComponents.AuthErrorMessage
+import com.example.newtestproject.screen.screenComponents.AuthErrorMessage
 import com.example.newtestproject.components.EncodeJwt
 import com.example.newtestproject.model.ErrorResponse
 import com.example.newtestproject.model.ServerAuthResponse
 import com.example.newtestproject.model.User
-import com.example.newtestproject.screen.authComponents.*
+import com.example.newtestproject.screen.screenComponents.*
 import com.example.newtestproject.util.SessionPrefs
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions

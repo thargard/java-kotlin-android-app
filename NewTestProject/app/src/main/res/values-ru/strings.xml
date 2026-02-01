@@ -44,4 +44,6 @@
     <string name="allOrders">Все заказы</string>
     <string name="noOrders">Заказов пока нет</string>
     <string name="unknownError">Неизвестная ошибка</string>
+    <string name="personal_cabinet">Личный кабинет</string>
+    <string name="my_orders">Мои заказы</string>
 </resources>
