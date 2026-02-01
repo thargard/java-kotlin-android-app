@@ -76,7 +76,7 @@ public class AuthController {
         try {
             GoogleIdToken.Payload payload = verifier.verify(token);
             String email = payload.getEmail();
-            String login = (String) payload.get("name");
+            String login = (String) payload.get("name"); // имя записывать не в логин а в переменную fullname
             String googleId = payload.getSubject();
 
             User user = userService.createOrGetUser(email, login, googleId);
@@ -91,6 +91,46 @@ public class AuthController {
         }catch(Exception e){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<?> getCurrentUser(@RequestHeader(value = "Authorization", required = false) String authorization) {
+        Long userId = jwtService.getUserIdFromToken(authorization);
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        return userService.findById(userId)
+                .map(user -> ResponseEntity.ok(userToMap(user)))
+                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+    }
+
+    @PatchMapping("/me")
+    public ResponseEntity<?> updateCurrentUser(
+            @RequestHeader(value = "Authorization", required = false) String authorization,
+            @RequestBody Map<String, String> body) {
+        Long userId = jwtService.getUserIdFromToken(authorization);
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        try {
+            String fullName = body.get("fullName");
+            String login = body.get("login");
+            String email = body.get("email");
+            User updated = userService.updateProfile(userId, fullName, login, email);
+            return ResponseEntity.ok(userToMap(updated));
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", ex.getMessage()));
+        }
+    }
+
+    private Map<String, Object> userToMap(User user) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("id", user.getId());
+        map.put("fullName", user.getFullName());
+        map.put("login", user.getLogin());
+        map.put("email", user.getEmail());
+        map.put("role", user.getRole() != null ? user.getRole().name() : null);
+        return map;
     }
 }
 
