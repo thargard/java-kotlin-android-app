@@ -20,6 +20,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
+import android.net.Uri
 import com.example.newtestproject.screen.screenComponents.LanguageButton
 import com.example.newtestproject.screen.screenComponents.ProfileButton
 import com.example.newtestproject.util.LanguageManager
@@ -29,6 +30,10 @@ import com.example.newtestproject.screen.FirstScreen
 import com.example.newtestproject.screen.GreetingScreen
 import com.example.newtestproject.screen.OrdersScreen
 import com.example.newtestproject.screen.ProfileScreen
+import com.example.newtestproject.screen.UserPortfolioScreen
+import com.example.newtestproject.screen.UsersPortfolioScreen
+import com.example.newtestproject.screen.screenComponents.OrdersButton
+import com.example.newtestproject.screen.screenComponents.PortfolioButton
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -75,6 +80,34 @@ fun MyApp() {
                     }
                 )
             }
+            composable("portfolios") {
+                UsersPortfolioScreen(
+                    onGoToOrders = {
+                        navController.navigate("orders") {
+                            launchSingleTop = true
+                        }
+                    },
+                    onOpenUserPortfolio = { userId, userLabel ->
+                        val encodedLabel = Uri.encode(userLabel)
+                        navController.navigate("portfolio/$userId/$encodedLabel")
+                    }
+                )
+            }
+            composable(
+                route = "portfolio/{userId}/{userLabel}",
+                arguments = listOf(
+                    navArgument("userId") { type = NavType.LongType },
+                    navArgument("userLabel") { type = NavType.StringType }
+                )
+            ) { backStackEntry ->
+                val userId = backStackEntry.arguments?.getLong("userId") ?: 0L
+                val userLabel = backStackEntry.arguments?.getString("userLabel") ?: ""
+                UserPortfolioScreen(
+                    userId = userId,
+                    userLabel = userLabel,
+                    onBackToPortfolios = { navController.popBackStack() }
+                )
+            }
             composable("profile") {
                 ProfileScreen(
                     onLogout = {
@@ -105,13 +138,16 @@ fun MyTopAppBar(navController: NavHostController) {
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStackEntry?.destination?.route
     val showProfile = currentRoute != "first" && currentRoute != "auth"
+    val showPortfolios = currentRoute != "first" && currentRoute != "auth" && currentRoute != "portfolios"
+    val showOrders = currentRoute != "first" && currentRoute != "auth" && currentRoute != "orders"
 
     TopAppBar(
         title = { Text(stringResource(id = R.string.app_name)) },
         actions = {
-            if (showProfile) {
-                ProfileButton(navController)
-            }
+            if (showPortfolios) PortfolioButton(navController)
+            if (showOrders) OrdersButton(navController)
+            if (showProfile) ProfileButton(navController)
+
             LanguageButton()
         }
     )
