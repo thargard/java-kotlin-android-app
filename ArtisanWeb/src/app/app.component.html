@@ -1,5 +1,5 @@
 <div class="flex flex-col items-center w-full mt-10 space-y-4">
-  <!-- Header with Auth Buttons -->
+  <!-- Header with Nav & Auth Buttons -->
   <div class="w-full max-w-4xl flex justify-between items-center px-4 mb-4">
     <div class="flex gap-2">
       <button
@@ -18,8 +18,20 @@
       </button>
     </div>
 
-    <!-- Auth Buttons -->
-    <div>
+    <!-- Nav + Auth Buttons -->
+    <div class="flex items-center gap-2">
+      <button
+        class="px-4 py-2 border rounded hover:bg-gray-100"
+        (click)="navigateToHome()"
+      >
+        {{ 'home.menu' | translate }}
+      </button>
+      <button
+        class="px-4 py-2 border rounded hover:bg-gray-100"
+        (click)="navigateToAnnouncements()"
+      >
+        {{ 'announcements.menu' | translate }}
+      </button>
       <button
         *ngIf="!isAuthenticated"
         (click)="navigateToLogin()"

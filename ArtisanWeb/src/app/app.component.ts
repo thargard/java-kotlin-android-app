@@ -42,12 +42,20 @@ export class AppComponent implements OnInit {
     localStorage.setItem('language', lang);
   }
 
+  navigateToHome() {
+    this.router.navigate(['/']);
+  }
+
   navigateToLogin() {
     this.router.navigate(['/login']);
   }
 
   navigateToRegister() {
     this.router.navigate(['/register']);
+  }
+
+  navigateToAnnouncements() {
+    this.router.navigate(['/announcements']);
   }
 
   navigateToProfile() {
