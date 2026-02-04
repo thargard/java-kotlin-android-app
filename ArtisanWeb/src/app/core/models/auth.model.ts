@@ -19,6 +19,7 @@ export interface LoginResponse {
     login: string; // username
     email?: string;
     password?: string;
+    avatarUrl?: string;
     role: string;
   };
 }
@@ -32,5 +33,6 @@ export interface User {
   login: string; // username
   email?: string;
   password?: string;
+  avatarUrl?: string;
   role: string;
 }

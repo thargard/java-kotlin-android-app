@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { FormsModule } from '@angular/forms';
@@ -15,7 +15,7 @@ import { OrderDto, OrderStatus } from '../../core/models/order.model';
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.css',
 })
-export class ProfileComponent implements OnInit {
+export class ProfileComponent implements OnInit, OnDestroy {
   user: User | null = null;
   loadingProfile = false;
   profileError: string | null = null;
@@ -26,6 +26,10 @@ export class ProfileComponent implements OnInit {
   editEmail = '';
   savingProfile = false;
   saveProfileError: string | null = null;
+  avatarFile: File | null = null;
+  avatarPreviewUrl: string | null = null;
+  avatarUploading = false;
+  avatarUploadError: string | null = null;
 
   orders: OrderDto[] = [];
   loadingOrders = false;
@@ -47,6 +51,10 @@ export class ProfileComponent implements OnInit {
     this.loadProfile();
   }
 
+  ngOnDestroy(): void {
+    this.revokeAvatarPreview();
+  }
+
   loadProfile(): void {
     this.loadingProfile = true;
     this.profileError = null;
@@ -56,6 +64,7 @@ export class ProfileComponent implements OnInit {
         this.editFullName = user.fullName ?? '';
         this.editLogin = user.login ?? '';
         this.editEmail = user.email ?? '';
+        this.avatarUploadError = null;
         this.loadingProfile = false;
         this.loadOrders();
       },
@@ -91,11 +100,53 @@ export class ProfileComponent implements OnInit {
     this.editEmail = this.user?.email ?? '';
     this.editMode = true;
     this.saveProfileError = null;
+    this.avatarUploadError = null;
   }
 
   cancelEdit(): void {
     this.editMode = false;
     this.saveProfileError = null;
+    this.avatarUploadError = null;
+    this.avatarFile = null;
+    this.revokeAvatarPreview();
+  }
+
+  onAvatarSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files && input.files[0] ? input.files[0] : null;
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      this.avatarUploadError = this.translate.instant('profile.avatarTypeError');
+      this.avatarFile = null;
+      this.revokeAvatarPreview();
+      return;
+    }
+
+    this.avatarUploadError = null;
+    this.avatarFile = file;
+    this.setAvatarPreview(file);
+  }
+
+  uploadAvatar(): void {
+    if (!this.avatarFile || !this.user) return;
+    this.avatarUploading = true;
+    this.avatarUploadError = null;
+    this.authService.uploadAvatar(this.avatarFile).subscribe({
+      next: (response) => {
+        this.avatarUploading = false;
+        if (response?.avatarUrl) {
+          this.user = { ...this.user!, avatarUrl: response.avatarUrl };
+          this.avatarPreviewUrl = response.avatarUrl;
+        }
+        this.avatarFile = null;
+      },
+      error: (err) => {
+        this.avatarUploading = false;
+        this.avatarUploadError =
+          err?.message || this.translate.instant('profile.avatarUploadError');
+      },
+    });
   }
 
   saveProfile(): void {
@@ -154,5 +205,20 @@ export class ProfileComponent implements OnInit {
     const key = 'profile.role' + role;
     const t = this.translate.instant(key);
     return t !== key ? t : role;
+  }
+  avatarDisplayUrl(): string | null {
+    return this.avatarPreviewUrl || this.user?.avatarUrl || null;
+  }
+
+  private setAvatarPreview(file: File): void {
+    this.revokeAvatarPreview();
+    this.avatarPreviewUrl = URL.createObjectURL(file);
+  }
+
+  private revokeAvatarPreview(): void {
+    if (this.avatarPreviewUrl && this.avatarPreviewUrl.startsWith('blob:')) {
+      URL.revokeObjectURL(this.avatarPreviewUrl);
+    }
+    this.avatarPreviewUrl = null;
   }
 }

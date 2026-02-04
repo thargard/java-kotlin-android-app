@@ -124,6 +124,13 @@ export class AuthService {
   }
 
   /**
+   * Получить список всех пользователей (GET /api/auth).
+   */
+  getAllUsers(): Observable<User[]> {
+    return this.http.get<User[]>(`${environment.apiUrl}/auth`);
+  }
+
+  /**
    * Выход пользователя из системы
    */
   logout(): void {
@@ -203,6 +210,31 @@ export class AuthService {
         this.currentUserSubject.next(user);
       })
     );
+  }
+
+  /**
+   * Загрузить аватар текущего пользователя (POST /api/users/me/avatar).
+   * Ожидает ответ { avatarUrl } и обновляет currentUser.
+   */
+  uploadAvatar(file: File): Observable<{ avatarUrl: string }> {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    return this.http
+      .post<{ avatarUrl: string }>(
+        `${environment.apiUrl}/users/me/avatar`,
+        formData
+      )
+      .pipe(
+        tap((response) => {
+          if (!response?.avatarUrl) return;
+          const current = this.getCurrentUser();
+          if (!current) return;
+          const next = { ...current, avatarUrl: response.avatarUrl };
+          this.setCurrentUser(next);
+          this.currentUserSubject.next(next);
+        })
+      );
   }
 
   /**
