@@ -1,0 +1,90 @@
+<div class="w-full max-w-4xl px-4 mx-auto">
+  <div class="mt-6 mb-4">
+    <a
+      routerLink="/profile"
+      class="inline-flex items-center text-sm text-gray-600 hover:text-gray-900"
+    >
+      <svg
+        class="w-4 h-4 mr-1"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M15 19l-7-7 7-7"
+        ></path>
+      </svg>
+      {{ "orders.backToProfile" | translate }}
+    </a>
+  </div>
+
+  <div *ngIf="loading" class="p-6 bg-white border border-gray-200 rounded-xl shadow-sm">
+    <div class="animate-pulse space-y-3">
+      <div class="h-6 bg-gray-200 rounded w-2/3"></div>
+      <div class="h-4 bg-gray-200 rounded w-1/2"></div>
+      <div class="h-4 bg-gray-200 rounded w-3/4"></div>
+    </div>
+  </div>
+
+  <div
+    *ngIf="!loading && error"
+    class="p-6 bg-white border border-red-200 rounded-xl shadow-sm text-sm text-red-700"
+  >
+    {{ error | translate }}
+  </div>
+
+  <div
+    *ngIf="!loading && order"
+    class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden"
+  >
+    <div class="p-6 border-b border-gray-200 bg-gray-50/50">
+      <h1 class="text-2xl font-semibold text-gray-900 mb-4">
+        {{ "orders.detailTitle" | translate }} #{{ order.id }}
+      </h1>
+      <dl class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div>
+          <dt class="text-xs font-medium text-gray-500">{{ "orders.tableStatus" | translate }}</dt>
+          <dd class="mt-1">
+            <span
+              class="inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-medium"
+              [ngClass]="statusBadgeClass(order.status)"
+            >
+              {{ statusLabel(order.status) }}
+            </span>
+          </dd>
+        </div>
+        <div>
+          <dt class="text-xs font-medium text-gray-500">{{ "orders.tableCreated" | translate }}</dt>
+          <dd class="mt-1 text-sm text-gray-900">{{ order.createdAt | date: "medium" }}</dd>
+        </div>
+        <div class="sm:col-span-2">
+          <dt class="text-xs font-medium text-gray-500">{{ "orders.tableDescription" | translate }}</dt>
+          <dd class="mt-1 text-sm text-gray-900 whitespace-pre-wrap">
+            {{ order.description || ("orders.emptyValue" | translate) }}
+          </dd>
+        </div>
+        <div *ngIf="order.user" class="sm:col-span-2">
+          <dt class="text-xs font-medium text-gray-500">{{ "orders.tableUser" | translate }}</dt>
+          <dd class="mt-1 text-sm text-gray-900">
+            {{ order.user.fullName || order.user.login || ("orders.emptyValue" | translate) }}
+            <span *ngIf="order.user.login" class="text-gray-500">(&#64;{{ order.user.login }})</span>
+          </dd>
+        </div>
+      </dl>
+    </div>
+    <div class="p-6">
+      <button
+        *ngIf="canStartChat()"
+        (click)="startChat()"
+        [disabled]="chatLoading"
+        class="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition"
+      >
+        <span *ngIf="chatLoading">{{ "orders.processing" | translate }}</span>
+        <span *ngIf="!chatLoading">{{ "orders.startChat" | translate }}</span>
+      </button>
+    </div>
+  </div>
+</div>

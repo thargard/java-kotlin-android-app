@@ -1,0 +1,171 @@
+<div class="w-full max-w-6xl px-4 mx-auto">
+  <div class="mt-6 mb-4">
+    <h1 class="text-2xl font-semibold tracking-tight text-gray-900">
+      {{ "products.title" | translate }}
+    </h1>
+    <p class="mt-1 text-sm text-gray-600">
+      {{ "products.subtitle" | translate }}
+    </p>
+  </div>
+
+  <!-- Filters -->
+  <div class="bg-white border border-gray-200 rounded-xl shadow-sm mb-6">
+    <div class="p-4 border-b border-gray-200 bg-gray-50/50">
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:gap-4">
+        <label class="block flex-1">
+          <span class="block text-xs font-medium text-gray-600 mb-1">
+            {{ "products.search" | translate }}
+          </span>
+          <input
+            [(ngModel)]="search"
+            (input)="applyFilter()"
+            type="text"
+            [placeholder]="'products.searchPlaceholder' | translate"
+            class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+          />
+        </label>
+        <label class="block sm:w-48">
+          <span class="block text-xs font-medium text-gray-600 mb-1">
+            {{ "products.category" | translate }}
+          </span>
+          <select
+            [(ngModel)]="selectedCategory"
+            (change)="applyFilter()"
+            class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+          >
+            <option *ngFor="let cat of categories" [value]="cat.value">
+              {{ cat.label | translate }}
+            </option>
+          </select>
+        </label>
+        <div class="flex gap-2 sm:justify-end">
+          <button
+            (click)="clearSearch()"
+            class="px-3 py-2 text-sm font-medium rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-400/20"
+          >
+            {{ "orders.reset" | translate }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div
+    *ngIf="loadingProducts"
+    class="p-6 bg-white border border-gray-200 rounded-xl shadow-sm"
+  >
+    <div class="animate-pulse space-y-3">
+      <div class="h-4 bg-gray-200 rounded w-2/3"></div>
+      <div class="h-4 bg-gray-200 rounded w-1/2"></div>
+      <div class="h-4 bg-gray-200 rounded w-3/4"></div>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div
+    *ngIf="!loadingProducts && productsError"
+    class="p-6 bg-white border border-red-200 rounded-xl shadow-sm text-sm text-red-700"
+  >
+    {{ productsError | translate }}
+  </div>
+
+  <!-- Empty State -->
+  <div
+    *ngIf="!loadingProducts && !productsError && products.length === 0"
+    class="p-6 bg-white border border-gray-200 rounded-xl shadow-sm text-sm text-gray-600"
+  >
+    {{ "products.empty" | translate }}
+  </div>
+
+  <!-- Products Grid -->
+  <div
+    *ngIf="!loadingProducts && !productsError && products.length > 0"
+    class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+  >
+    <a
+      class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden hover:border-blue-400 hover:shadow-md transition group"
+      *ngFor="let product of products; trackBy: trackByProductId"
+      [routerLink]="['/products', product.id]"
+    >
+      <div class="h-48 overflow-hidden bg-gray-100 relative">
+        <img
+          *ngIf="product.imageUrl"
+          [src]="product.imageUrl"
+          [alt]="product.name"
+          class="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+        />
+        <div
+          *ngIf="!product.imageUrl"
+          class="w-full h-full flex items-center justify-center text-gray-400"
+        >
+          <svg
+            class="w-12 h-12"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+            ></path>
+          </svg>
+        </div>
+        <span
+          *ngIf="!product.isAvailable"
+          class="absolute top-2 right-2 px-2 py-1 text-xs font-medium bg-red-100 text-red-700 rounded-full"
+        >
+          {{ "products.unavailable" | translate }}
+        </span>
+      </div>
+      <div class="p-4">
+        <div class="text-xs text-gray-500 mb-1">{{ product.category }}</div>
+        <h3 class="text-lg font-medium text-gray-900 mb-2 line-clamp-1">
+          {{ product.name }}
+        </h3>
+        <p class="text-sm text-gray-600 mb-3 line-clamp-2">
+          {{ product.description }}
+        </p>
+        <div class="flex items-center justify-between">
+          <span class="text-lg font-semibold text-gray-900">
+            {{ product.price | currency: "USD" }}
+          </span>
+          <span class="text-xs text-gray-500">
+            {{ "products.bySeller" | translate }} {{ product.sellerName }}
+          </span>
+        </div>
+      </div>
+    </a>
+  </div>
+
+  <!-- Pagination -->
+  <div
+    *ngIf="!loadingProducts && !productsError && totalPages > 1"
+    class="mt-6 flex items-center justify-between"
+  >
+    <div class="text-sm text-gray-600">
+      {{ "products.showing" | translate }} {{ currentPage * pageSize + 1 }} -
+      {{ Math.min((currentPage + 1) * pageSize, totalElements) }}
+      {{ "products.of" | translate }} {{ totalElements }}
+      {{ "products.products" | translate }}
+    </div>
+    <div class="flex gap-2">
+      <button
+        (click)="previousPage()"
+        [disabled]="currentPage === 0"
+        class="px-3 py-2 text-sm font-medium rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-400/20 disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        {{ "products.previous" | translate }}
+      </button>
+      <button
+        (click)="nextPage()"
+        [disabled]="currentPage >= totalPages - 1"
+        class="px-3 py-2 text-sm font-medium rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-400/20 disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        {{ "products.next" | translate }}
+      </button>
+    </div>
+  </div>
+</div>

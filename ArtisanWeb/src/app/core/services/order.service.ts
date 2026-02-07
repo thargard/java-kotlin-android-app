@@ -16,4 +16,12 @@ export class OrderService extends BaseHttpService {
   getOrders(params?: GetOrdersParams): Observable<OrderDto[]> {
     return this.get<OrderDto[]>(this.endpoint, params);
   }
+
+  /**
+   * Получить заказ по ID.
+   * Backend: GET /api/orders/:id
+   */
+  getOrderById(id: number): Observable<OrderDto | null> {
+    return this.get<OrderDto>(`${this.endpoint}/${id}`);
+  }
 }
