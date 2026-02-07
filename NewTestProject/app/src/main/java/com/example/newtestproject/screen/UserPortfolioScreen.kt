@@ -27,8 +27,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.newtestproject.R
 import com.example.newtestproject.RetrofitClient
-import com.example.newtestproject.model.Order
-import com.example.newtestproject.model.OrderStatus
+import com.example.newtestproject.model.Product
+import com.example.newtestproject.screen.screenComponents.ProductCard
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -37,33 +37,50 @@ import retrofit2.Response
 fun UserPortfolioScreen(
     userId: Long,
     userLabel: String,
-    onBackToPortfolios: () -> Unit
+    sellerKey: String,
+    onBackToPortfolios: () -> Unit,
+    onOpenProduct: (Long) -> Unit
 ) {
-    var orders by remember { mutableStateOf<List<Order>>(emptyList()) }
+    var products by remember { mutableStateOf<List<Product>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
-    LaunchedEffect(userId) {
-        RetrofitClient.api.getOrdersByUser(userId)
-            .enqueue(object : Callback<List<Order>> {
-                override fun onResponse(
-                    call: Call<List<Order>>,
-                    response: Response<List<Order>>
-                ) {
-                    isLoading = false
-                    if (response.isSuccessful) {
-                        orders = (response.body() ?: emptyList())
-                            .filter { it.status == OrderStatus.COMPLETED }
+    LaunchedEffect(userId, sellerKey) {
+        val call = if (userId >= 0L) {
+            RetrofitClient.api.getProducts(sellerId = userId, size = 200)
+        } else {
+            RetrofitClient.api.getProducts(size = 200)
+        }
+        call.enqueue(object : Callback<com.example.newtestproject.model.ProductPageResponse> {
+            override fun onResponse(
+                call: Call<com.example.newtestproject.model.ProductPageResponse>,
+                response: Response<com.example.newtestproject.model.ProductPageResponse>
+            ) {
+                isLoading = false
+                if (response.isSuccessful) {
+                    val allProducts = response.body()?.content ?: emptyList()
+                    products = if (userId >= 0L) {
+                        allProducts
                     } else {
-                        errorMessage = "Error loading portfolio: ${response.code()}"
+                        allProducts.filter { product ->
+                            val key = product.seller?.login
+                                ?: product.seller?.email
+                                ?: product.sellerName
+                                ?: product.sellerId?.toString()
+                                ?: "unknown"
+                            key == sellerKey
+                        }
                     }
+                } else {
+                    errorMessage = "Error loading portfolio: ${response.code()}"
                 }
+            }
 
-                override fun onFailure(call: Call<List<Order>>, t: Throwable) {
-                    isLoading = false
-                    errorMessage = "Network error: ${t.message}"
-                }
-            })
+            override fun onFailure(call: Call<com.example.newtestproject.model.ProductPageResponse>, t: Throwable) {
+                isLoading = false
+                errorMessage = "Network error: ${t.message}"
+            }
+        })
     }
 
     Column(
@@ -95,9 +112,9 @@ fun UserPortfolioScreen(
                     color = MaterialTheme.colorScheme.error
                 )
             }
-            orders.isEmpty() -> {
+            products.isEmpty() -> {
                 Text(
-                    text = stringResource(id = R.string.no_completed_orders),
+                    text = stringResource(id = R.string.no_products_in_portfolio),
                     style = MaterialTheme.typography.bodyLarge
                 )
             }
@@ -106,8 +123,16 @@ fun UserPortfolioScreen(
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    items(orders) { order ->
-                        OrderCard(order = order)
+                    items(products) { product ->
+                        val productId = product.id
+                        ProductCard(
+                            product = product,
+                            onClick = if (productId != null) {
+                                { onOpenProduct(productId) }
+                            } else {
+                                null
+                            }
+                        )
                     }
                 }
             }
