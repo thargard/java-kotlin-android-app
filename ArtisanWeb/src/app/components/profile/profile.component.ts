@@ -39,7 +39,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private orderService: OrderService,
     private translate: TranslateService,
-    private router: Router
+    private router: Router,
   ) {}
 
   ngOnInit(): void {
@@ -117,7 +117,9 @@ export class ProfileComponent implements OnInit, OnDestroy {
     if (!file) return;
 
     if (!file.type.startsWith('image/')) {
-      this.avatarUploadError = this.translate.instant('profile.avatarTypeError');
+      this.avatarUploadError = this.translate.instant(
+        'profile.avatarTypeError',
+      );
       this.avatarFile = null;
       this.revokeAvatarPreview();
       return;
@@ -220,5 +222,21 @@ export class ProfileComponent implements OnInit, OnDestroy {
       URL.revokeObjectURL(this.avatarPreviewUrl);
     }
     this.avatarPreviewUrl = null;
+  }
+
+  createProduct(): void {
+    this.router.navigate(['/products/create']);
+  }
+
+  offerService(): void {
+    this.router.navigate(['/announcements/create']);
+  }
+
+  submitRequest(): void {
+    this.router.navigate(['/requests/create']);
+  }
+
+  openOrder(orderId: number): void {
+    this.router.navigate(['/orders', orderId]);
   }
 }

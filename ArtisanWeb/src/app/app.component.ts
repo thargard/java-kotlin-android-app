@@ -58,8 +58,20 @@ export class AppComponent implements OnInit {
     this.router.navigate(['/announcements']);
   }
 
+  navigateToProducts() {
+    this.router.navigate(['/products']);
+  }
+
+  navigateToCart() {
+    this.router.navigate(['/cart']);
+  }
+
   navigateToProfile() {
     this.router.navigate(['/profile']);
+  }
+
+  navigateToMessages() {
+    this.router.navigate(['/messages']);
   }
 
   logout() {
