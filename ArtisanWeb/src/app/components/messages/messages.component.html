@@ -1,0 +1,67 @@
+<div class="w-full max-w-2xl px-4 mx-auto">
+  <div class="mt-6 mb-6">
+    <h1 class="text-2xl font-semibold tracking-tight text-gray-900">
+      {{ "messages.title" | translate }}
+    </h1>
+    <p class="mt-1 text-sm text-gray-600">
+      {{ "messages.subtitle" | translate }}
+    </p>
+  </div>
+
+  <div *ngIf="loading" class="p-6 bg-white border border-gray-200 rounded-xl shadow-sm">
+    <div class="animate-pulse space-y-3">
+      <div class="h-4 bg-gray-200 rounded w-2/3"></div>
+      <div class="h-4 bg-gray-200 rounded w-1/2"></div>
+      <div class="h-4 bg-gray-200 rounded w-3/4"></div>
+    </div>
+  </div>
+
+  <div *ngIf="!loading && error" class="p-6 bg-white border border-red-200 rounded-xl text-sm text-red-700">
+    {{ error | translate }}
+    <button
+      (click)="loadThreads()"
+      class="mt-3 px-3 py-2 text-sm font-medium rounded-lg bg-red-600 text-white hover:bg-red-700"
+    >
+      {{ "orders.retry" | translate }}
+    </button>
+  </div>
+
+  <div *ngIf="!loading && !error && conversations.length === 0" class="p-6 bg-white border border-gray-200 rounded-xl text-sm text-gray-600">
+    {{ "messages.empty" | translate }}
+  </div>
+
+  <div *ngIf="!loading && !error && conversations.length > 0" class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+    <ul class="divide-y divide-gray-100">
+      <li *ngFor="let conv of conversations">
+        <div
+          (click)="openChat(conv.threadId)"
+          role="button"
+          tabindex="0"
+          class="flex items-center gap-4 p-4 hover:bg-gray-50/70 transition cursor-pointer"
+        >
+          <div class="h-10 w-10 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-sm font-medium shrink-0">
+            {{ conv.otherPartyName[0] | uppercase }}
+          </div>
+          <div class="min-w-0 flex-1">
+            <div class="flex items-center gap-2">
+              <span class="font-medium text-gray-900 truncate">
+                <a *ngIf="conv.otherPartyId" [routerLink]="['/users', conv.otherPartyId]" class="text-gray-900 hover:text-indigo-600 hover:underline" (click)="$event.stopPropagation()">{{ conv.otherPartyName }}</a>
+                <span *ngIf="!conv.otherPartyId">{{ conv.otherPartyName }}</span>
+              </span>
+              <span *ngIf="conv.unreadCount > 0" class="shrink-0 px-2 py-0.5 text-xs font-medium bg-indigo-600 text-white rounded-full">
+                {{ conv.unreadCount }}
+              </span>
+            </div>
+            <p class="text-sm text-gray-600 truncate">{{ conv.lastMessage }}</p>
+          </div>
+          <div class="text-xs text-gray-500 shrink-0">
+            {{ conv.lastMessageAt | date: "short" }}
+          </div>
+          <svg class="w-5 h-5 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+          </svg>
+        </div>
+      </li>
+    </ul>
+  </div>
+</div>

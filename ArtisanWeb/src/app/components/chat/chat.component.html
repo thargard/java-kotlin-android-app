@@ -1,0 +1,73 @@
+<div class="w-full max-w-2xl px-4 mx-auto">
+  <div class="mt-6 mb-4">
+    <a
+      routerLink="/messages"
+      class="inline-flex items-center text-sm text-gray-600 hover:text-gray-900"
+    >
+      <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+      </svg>
+      {{ "chat.backToProfile" | translate }}
+    </a>
+  </div>
+
+  <div *ngIf="loading" class="p-6 bg-white border border-gray-200 rounded-xl">
+    <div class="animate-pulse space-y-2">
+      <div class="h-4 bg-gray-200 rounded w-3/4"></div>
+      <div class="h-4 bg-gray-200 rounded w-1/2"></div>
+    </div>
+  </div>
+
+  <div *ngIf="!loading && error" class="p-6 bg-white border border-red-200 rounded-xl text-sm text-red-700">
+    {{ error | translate }}
+  </div>
+
+  <div *ngIf="!loading && !error && threadId" class="bg-white border border-gray-200 rounded-xl shadow-sm flex flex-col" style="min-height: 400px;">
+    <div class="p-4 border-b border-gray-200 bg-gray-50/50 flex items-center justify-between gap-2">
+      <h1 class="text-lg font-semibold text-gray-900">{{ "chat.title" | translate }}</h1>
+      <div *ngIf="interlocutorName" class="flex items-center gap-2">
+        <span class="text-sm text-gray-600">{{ "chat.with" | translate }}:</span>
+        <a *ngIf="interlocutorId" [routerLink]="['/users', interlocutorId]" class="text-indigo-600 hover:text-indigo-700 font-medium">
+          {{ interlocutorName }}
+        </a>
+        <span *ngIf="!interlocutorId" class="font-medium text-gray-900">{{ interlocutorName }}</span>
+      </div>
+    </div>
+    <div class="flex-1 overflow-y-auto p-4 space-y-3" style="max-height: 400px;">
+      <div
+        *ngFor="let msg of messages"
+        [class.text-right]="isMine(msg)"
+        [class.pl-12]="!isMine(msg)"
+        [class.pr-12]="isMine(msg)"
+      >
+        <div
+          [class]="isMine(msg)
+            ? 'inline-block px-4 py-2 rounded-lg bg-indigo-600 text-white text-sm'
+            : 'inline-block px-4 py-2 rounded-lg bg-gray-100 text-gray-900 text-sm'"
+        >
+          <div *ngIf="!isMine(msg)" class="text-xs text-gray-500 mb-0.5">{{ msg.senderName }}</div>
+          <div>{{ msg.content }}</div>
+          <div class="text-xs opacity-80 mt-0.5">{{ msg.createdAt | date: "short" }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="p-4 border-t border-gray-200">
+      <form (ngSubmit)="sendMessage()" class="flex gap-2">
+        <input
+          [(ngModel)]="newMessage"
+          name="newMessage"
+          type="text"
+          [placeholder]="'chat.placeholder' | translate"
+          class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+        />
+        <button
+          type="submit"
+          [disabled]="sending || !newMessage?.trim()"
+          class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {{ "chat.send" | translate }}
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
