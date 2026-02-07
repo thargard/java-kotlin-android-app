@@ -1,5 +1,6 @@
 package com.example.newtestproject.screen
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -27,10 +28,12 @@ fun ProfileScreen(
     var orders by remember { mutableStateOf<List<Order>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
+    var showCreateDialog by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
     val token = SessionPrefs.getServerToken(context)
     val payload = token?.let { EncodeJwt(it) }
+    val authHeader = token?.let { "Bearer $it" }
 
     LaunchedEffect(Unit) {
         val userId = payload?.id
@@ -61,6 +64,54 @@ fun ProfileScreen(
             })
     }
 
+    if (showCreateDialog) {
+        CreateProductDialog(
+            onDismiss = { showCreateDialog = false },
+            onSubmit = { name, priceText, category, description, imageUrl ->
+                if (authHeader == null) {
+                    Toast.makeText(context, context.getString(R.string.login_required), Toast.LENGTH_SHORT).show()
+                    return@CreateProductDialog
+                }
+                if (name.isBlank() || category.isBlank()) {
+                    Toast.makeText(context, context.getString(R.string.fill_required_fields), Toast.LENGTH_SHORT).show()
+                    return@CreateProductDialog
+                }
+                val price = priceText.toDoubleOrNull()
+                if (price == null || price <= 0.0) {
+                    Toast.makeText(context, context.getString(R.string.invalid_price), Toast.LENGTH_SHORT).show()
+                    return@CreateProductDialog
+                }
+
+                val payload = com.example.newtestproject.model.ProductCreateRequest(
+                    name = name.trim(),
+                    description = description.trim().ifBlank { null },
+                    category = category.trim(),
+                    imageUrl = imageUrl.trim().ifBlank { null },
+                    price = price
+                )
+
+                RetrofitClient.api.createProduct(authHeader, payload)
+                    .enqueue(object : Callback<com.example.newtestproject.model.Product> {
+                        override fun onResponse(
+                            call: Call<com.example.newtestproject.model.Product>,
+                            response: Response<com.example.newtestproject.model.Product>
+                        ) {
+                            if (response.isSuccessful) {
+                                Toast.makeText(context, context.getString(R.string.product_created), Toast.LENGTH_SHORT).show()
+                                showCreateDialog = false
+                            } else {
+                                Toast.makeText(context, context.getString(R.string.product_create_failed), Toast.LENGTH_SHORT).show()
+                            }
+                        }
+
+                        override fun onFailure(call: Call<com.example.newtestproject.model.Product>, t: Throwable) {
+                            Toast.makeText(context, context.getString(R.string.product_create_failed), Toast.LENGTH_SHORT).show()
+                        }
+                    })
+            }
+        )
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -73,7 +124,6 @@ fun ProfileScreen(
             modifier = Modifier.padding(bottom = 16.dp)
         )
 
-        // Логин и email из JWT
         Card(
             modifier = Modifier.fillMaxWidth(),
             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
@@ -91,6 +141,15 @@ fun ProfileScreen(
                     fontWeight = FontWeight.Medium
                 )
             }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(
+            onClick = { showCreateDialog = true },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(stringResource(id = R.string.create_product))
         }
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -146,4 +205,77 @@ fun ProfileScreen(
             Text(stringResource(id = R.string.logout))
         }
     }
+}
+
+@Composable
+private fun CreateProductDialog(
+    onDismiss: () -> Unit,
+    onSubmit: (String, String, String, String, String) -> Unit
+) {
+    val nameState = remember { mutableStateOf("") }
+    val priceState = remember { mutableStateOf("") }
+    val categoryState = remember { mutableStateOf("") }
+    val descriptionState = remember { mutableStateOf("") }
+    val imageUrlState = remember { mutableStateOf("") }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(id = R.string.create_product)) },
+        text = {
+            Column(modifier = Modifier.fillMaxWidth()) {
+                OutlinedTextField(
+                    value = nameState.value,
+                    onValueChange = { nameState.value = it },
+                    label = { Text(stringResource(id = R.string.product_name)) },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                OutlinedTextField(
+                    value = priceState.value,
+                    onValueChange = { priceState.value = it },
+                    label = { Text(stringResource(id = R.string.price)) },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                OutlinedTextField(
+                    value = categoryState.value,
+                    onValueChange = { categoryState.value = it },
+                    label = { Text(stringResource(id = R.string.category)) },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                OutlinedTextField(
+                    value = descriptionState.value,
+                    onValueChange = { descriptionState.value = it },
+                    label = { Text(stringResource(id = R.string.product_description)) },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                OutlinedTextField(
+                    value = imageUrlState.value,
+                    onValueChange = { imageUrlState.value = it },
+                    label = { Text(stringResource(id = R.string.image_url)) },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        },
+        confirmButton = {
+            Button(onClick = {
+                onSubmit(
+                    nameState.value,
+                    priceState.value,
+                    categoryState.value,
+                    descriptionState.value,
+                    imageUrlState.value
+                )
+            }) {
+                Text(stringResource(id = R.string.save))
+            }
+        },
+        dismissButton = {
+            Button(onClick = onDismiss) {
+                Text(stringResource(id = R.string.cancel))
+            }
+        }
+    )
 }
