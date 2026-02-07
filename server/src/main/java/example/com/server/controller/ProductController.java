@@ -1,8 +1,12 @@
 package example.com.server.controller;
 
+import example.com.server.model.CartItem;
 import example.com.server.model.Product;
 import example.com.server.model.User;
+import example.com.server.service.CartService;
 import example.com.server.service.JwtService;
+import example.com.server.service.MessageService;
+import example.com.server.service.OrderService;
 import example.com.server.service.ProductService;
 import example.com.server.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,12 +27,19 @@ public class ProductController {
     private final ProductService productService;
     private final JwtService jwtService;
     private final UserService userService;
+    private final CartService cartService;
+    private final OrderService orderService;
+    private final MessageService messageService;
 
     @Autowired
-    public ProductController(ProductService productService, JwtService jwtService, UserService userService) {
+    public ProductController(ProductService productService, JwtService jwtService, UserService userService,
+                             CartService cartService, OrderService orderService, MessageService messageService) {
         this.productService = productService;
         this.jwtService = jwtService;
         this.userService = userService;
+        this.cartService = cartService;
+        this.orderService = orderService;
+        this.messageService = messageService;
     }
 
     @GetMapping
@@ -177,7 +188,8 @@ public class ProductController {
     @PostMapping("/{id}/cart")
     public ResponseEntity<?> addToCart(
             @RequestHeader(value = "Authorization", required = false) String authorization,
-            @PathVariable Long id) {
+            @PathVariable Long id,
+            @RequestBody Map<String, Object> body) {
         Long userId = jwtService.getUserIdFromToken(authorization);
         if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
@@ -190,12 +202,26 @@ public class ProductController {
                     .body(Map.of("error", "Product not found"));
         }
 
-        // For now, just return success - in a real implementation, this would add to user's cart
-        return ResponseEntity.ok(Map.of(
-                "message", "Product added to cart",
-                "productId", id,
-                "userId", userId
-        ));
+        try {
+            Integer quantity = 1;
+            if (body.get("quantity") != null) {
+                quantity = Integer.valueOf(body.get("quantity").toString());
+            }
+
+            CartItem cartItem = cartService.addToCart(userId, id, quantity);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Product added to cart");
+            response.put("cartItemId", cartItem.getId());
+            response.put("productId", id);
+            response.put("quantity", cartItem.getQuantity());
+            response.put("totalPrice", cartItem.getTotalPrice());
+
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", ex.getMessage()));
+        }
     }
 
     @PostMapping("/{id}/buy")
@@ -208,55 +234,83 @@ public class ProductController {
                     .body(Map.of("error", "Authentication required"));
         }
 
-        Optional<Product> product = productService.findById(id);
-        if (product.isEmpty()) {
+        Optional<Product> productOpt = productService.findById(id);
+        if (productOpt.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(Map.of("error", "Product not found"));
         }
 
-        Product p = product.get();
-        if (!p.getIsAvailable()) {
+        Product product = productOpt.get();
+        if (!product.getIsAvailable()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("error", "Product is not available"));
         }
 
-        // For now, just return order details - in a real implementation, this would create an order
-        return ResponseEntity.ok(Map.of(
-                "message", "Purchase successful",
-                "orderId", System.currentTimeMillis(), // Mock order ID
-                "productId", id,
-                "productName", p.getName(),
-                "price", p.getPrice(),
-                "sellerId", p.getSeller().getId(),
-                "sellerName", p.getSeller().getFullName() != null ? p.getSeller().getFullName() : p.getSeller().getLogin()
-        ));
+        // Create an order for this product
+        String description = "Purchase: " + product.getName() + " (ID: " + product.getId() + ")";
+        var order = orderService.createOrder(userId, description);
+
+        // Mark product as sold (not available)
+        productService.updateProduct(id, null, null, null, null, false);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Purchase successful");
+        response.put("orderId", order.getId());
+        response.put("productId", id);
+        response.put("productName", product.getName());
+        response.put("price", product.getPrice());
+        response.put("sellerId", product.getSeller().getId());
+        response.put("sellerName", product.getSeller().getFullName() != null ? product.getSeller().getFullName() : product.getSeller().getLogin());
+        response.put("orderStatus", order.getStatus().name());
+        response.put("createdAt", order.getCreatedAt());
+
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/{id}/contact")
     public ResponseEntity<?> contactSeller(
             @RequestHeader(value = "Authorization", required = false) String authorization,
-            @PathVariable Long id) {
+            @PathVariable Long id,
+            @RequestBody Map<String, Object> body) {
         Long userId = jwtService.getUserIdFromToken(authorization);
         if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("error", "Authentication required"));
         }
 
-        Optional<Product> product = productService.findById(id);
-        if (product.isEmpty()) {
+        Optional<Product> productOpt = productService.findById(id);
+        if (productOpt.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(Map.of("error", "Product not found"));
         }
 
-        Product p = product.get();
-        // For now, just return chat details - in a real implementation, this would create/start a chat
-        return ResponseEntity.ok(Map.of(
-                "message", "Chat started with seller",
-                "threadId", System.currentTimeMillis(), // Mock thread ID
-                "productId", id,
-                "sellerId", p.getSeller().getId(),
-                "sellerName", p.getSeller().getFullName() != null ? p.getSeller().getFullName() : p.getSeller().getLogin()
-        ));
+        Product product = productOpt.get();
+        Long sellerId = product.getSeller().getId();
+
+        // Don't allow contacting yourself
+        if (sellerId.equals(userId)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", "You cannot contact yourself"));
+        }
+
+        String message = "Hi, I'm interested in your product: " + product.getName();
+        if (body.get("message") != null) {
+            message = body.get("message").toString();
+        }
+
+        // Start a conversation
+        var firstMessage = messageService.startConversation(userId, sellerId, id, message);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Chat started with seller");
+        response.put("threadId", firstMessage.getThreadId());
+        response.put("productId", id);
+        response.put("sellerId", sellerId);
+        response.put("sellerName", product.getSeller().getFullName() != null ? product.getSeller().getFullName() : product.getSeller().getLogin());
+        response.put("messageId", firstMessage.getId());
+        response.put("createdAt", firstMessage.getCreatedAt());
+
+        return ResponseEntity.ok(response);
     }
 
     private Map<String, Object> productToMap(Product product) {
