@@ -42,8 +42,16 @@
     <string name="user">Пользователь</string>
     <string name="createdAt">Создан</string>
     <string name="allOrders">Все заказы</string>
+    <string name="no_completed_orders">Нет выполненных заказов</string>
     <string name="noOrders">Заказов пока нет</string>
     <string name="unknownError">Неизвестная ошибка</string>
     <string name="personal_cabinet">Личный кабинет</string>
     <string name="my_orders">Мои заказы</string>
+    <string name="open_portfolios">Портфолио</string>
+    <string name="all_portfolios">Все портфолио</string>
+    <string name="go_to_orders">Все заказы</string>
+    <string name="completed_works_count">Выполнены: %1$d</string>
+    <string name="no_portfolios">Портфолио не найдены</string>
+    <string name="user_portfolio_title">Портфолио: %1$s</string>
+    <string name="back_to_portfolios">Вернуться к портфолио</string>
 </resources>

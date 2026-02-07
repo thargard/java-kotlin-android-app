@@ -42,8 +42,16 @@
     <string name="user">User</string>
     <string name="createdAt">Created at</string>
     <string name="allOrders">All orders</string>
+    <string name="no_completed_orders">No completed orders</string>
     <string name="noOrders">There are no orders</string>
     <string name="unknownError">Unknown error</string>
     <string name="personal_cabinet">Personal cabinet</string>
     <string name="my_orders">My orders</string>
+    <string name="open_portfolios">Portfolios</string>
+    <string name="all_portfolios">All portfolios</string>
+    <string name="go_to_orders">All orders</string>
+    <string name="completed_works_count">Completed: %1$d</string>
+    <string name="no_portfolios">No portfolios found</string>
+    <string name="user_portfolio_title">Portfolio: %1$s</string>
+    <string name="back_to_portfolios">Back to portfolios</string>
 </resources>
