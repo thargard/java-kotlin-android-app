@@ -42,6 +42,22 @@
     </div>
   </div>
 
+  <div class="rating-section mb-6">
+    <!-- Отображение рейтинга исполнителя -->
+    <app-producer-rating 
+      [producerId]="producerId"
+      [showDetails]="true">
+    </app-producer-rating>
+
+    <!-- Форма для выставления оценки (показывать только залогиненным пользователям) -->
+    <app-rate-producer 
+      *ngIf="currentUserId && currentUserId !== producerId"
+      [producerId]="producerId"
+      [customerId]="currentUserId"
+      (ratingSubmitted)="onRatingSubmitted()">
+    </app-rate-producer>
+  </div>
+
   <div class="mb-4">
     <h2 class="text-lg font-medium text-gray-900 mb-3">
       {{ 'users.portfolioOrdersTitle' | translate }}

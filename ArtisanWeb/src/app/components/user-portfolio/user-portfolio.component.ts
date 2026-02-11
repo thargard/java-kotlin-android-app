@@ -6,16 +6,20 @@ import { AuthService } from '../../core/services/auth.service';
 import { OrderService } from '../../core/services/order.service';
 import { User } from '../../core/models/auth.model';
 import { OrderDto, OrderStatus } from '../../core/models/order.model';
+import { ProducerRatingComponent } from '../producer-rating/producer-rating.component';
+import { RateProducerComponent } from '../rate-producer/rate-producer.component';
 
 @Component({
   selector: 'app-user-portfolio',
   standalone: true,
-  imports: [CommonModule, RouterModule, TranslateModule],
+  imports: [CommonModule, RouterModule, TranslateModule, ProducerRatingComponent, RateProducerComponent],
   templateUrl: './user-portfolio.component.html',
   styleUrl: './user-portfolio.component.css',
 })
 export class UserPortfolioComponent implements OnInit {
   user: User | null = null;
+  producerId: number = 0;
+  currentUserId: number | null = null;
   loadingUser = false;
   userError: string | null = null;
 
@@ -37,8 +41,28 @@ export class UserPortfolioComponent implements OnInit {
       this.userError = this.translate.instant('users.invalidId');
       return;
     }
+    this.producerId = userId || 0;
+    this.loadCurrentUser();
     this.loadUser(userId);
     this.loadOrders(userId);
+  }
+
+  private loadCurrentUser(): void {
+    this.authService.currentUser$.subscribe({
+      next: (user) => {
+        this.currentUserId = user?.id ?? null;
+      },
+      error: (err) => {
+        console.error('Error getting current user:', err);
+        this.currentUserId = null;
+      }
+    });
+  }
+
+  onRatingSubmitted(): void {
+    // Refresh ratings when a new rating is submitted
+    // This can be used to trigger a refresh if needed
+    console.log('Rating submitted successfully');
   }
 
   private loadUser(userId: number): void {

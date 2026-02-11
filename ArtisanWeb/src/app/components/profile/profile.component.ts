@@ -7,11 +7,12 @@ import { AuthService } from '../../core/services/auth.service';
 import { OrderService } from '../../core/services/order.service';
 import { User } from '../../core/models/auth.model';
 import { OrderDto, OrderStatus } from '../../core/models/order.model';
+import { ProducerRatingComponent } from '../producer-rating/producer-rating.component';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, TranslateModule, FormsModule],
+  imports: [CommonModule, TranslateModule, FormsModule, ProducerRatingComponent],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.css',
 })
@@ -19,6 +20,8 @@ export class ProfileComponent implements OnInit, OnDestroy {
   user: User | null = null;
   loadingProfile = false;
   profileError: string | null = null;
+  producerId: number = 0;
+  currentUserId: number | null = null;
 
   editMode = false;
   editFullName = '';
@@ -47,8 +50,23 @@ export class ProfileComponent implements OnInit, OnDestroy {
       this.router.navigate(['/login']);
       return;
     }
+    this.loadCurrentUser();
     this.user = this.authService.getCurrentUser();
+    this.producerId = this.user?.id ?? 0;
+    console.log('Current User ID:', this.currentUserId);    
     this.loadProfile();
+  }
+
+  private loadCurrentUser(): void {
+    this.authService.currentUser$.subscribe({
+      next: (user) => {
+        this.currentUserId = user?.id ?? null;
+      },
+      error: (err) => {
+        console.error('Error getting current user:', err);
+        this.currentUserId = null;
+      }
+    });
   }
 
   ngOnDestroy(): void {

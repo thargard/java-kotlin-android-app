@@ -1,0 +1,53 @@
+<!-- src/app/components/rate-producer/rate-producer.component.html -->
+
+<div class="rate-producer">
+  <div class="rate-header">
+    <h3>{{ hasRated ? 'Ваша оценка' : 'Оцените исполнителя' }}</h3>
+  </div>
+
+  <div class="rate-content">
+    <!-- Звезды для выставления оценки -->
+    <div class="star-container">
+      <app-star-rating 
+        [rating]="currentRating"
+        [readonly]="false"
+        size="large"
+        (ratingChange)="onRatingChange($event)">
+      </app-star-rating>
+      <span *ngIf="currentRating > 0" class="rating-label">
+        {{ currentRating }} из 5
+      </span>
+    </div>
+
+    <!-- Сообщения -->
+    <div *ngIf="error" class="message error-message">
+      {{ error }}
+    </div>
+
+    <div *ngIf="success" class="message success-message">
+      {{ success }}
+    </div>
+
+    <!-- Кнопки -->
+    <div class="button-group">
+      <button 
+        class="btn btn-primary"
+        [disabled]="loading || currentRating === 0"
+        (click)="submitRating()">
+        <span *ngIf="!loading">{{ hasRated ? 'Обновить оценку' : 'Отправить оценку' }}</span>
+        <span *ngIf="loading" class="btn-loading">
+          <span class="spinner-small"></span>
+          Сохранение...
+        </span>
+      </button>
+
+      <button 
+        *ngIf="hasRated && hasChanges"
+        class="btn btn-secondary"
+        [disabled]="loading"
+        (click)="cancelEdit()">
+        Отменить
+      </button>
+    </div>
+  </div>
+</div>

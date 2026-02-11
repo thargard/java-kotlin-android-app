@@ -1,0 +1,77 @@
+/* src/app/components/star-rating/star-rating.component.css */
+
+.star-rating {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.star {
+  display: inline-block;
+  cursor: default;
+  transition: all 0.2s ease;
+}
+
+.star.clickable {
+  cursor: pointer;
+}
+
+.star svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Размеры звезд */
+.star-small {
+  width: 16px;
+  height: 16px;
+}
+
+.star-medium {
+  width: 24px;
+  height: 24px;
+}
+
+.star-large {
+  width: 32px;
+  height: 32px;
+}
+
+/* Состояния звезд */
+.star.empty {
+  color: #d1d5db;
+}
+
+.star.filled {
+  color: #fbbf24;
+}
+
+.star.half-filled {
+  color: #fbbf24;
+}
+
+.star.half-filled svg path {
+  fill: url(#half-fill);
+}
+
+/* Hover эффект */
+.star.clickable:hover {
+  transform: scale(1.1);
+}
+
+.star-rating.readonly .star {
+  cursor: default;
+}
+
+/* Дополнительные стили для анимации */
+.star svg path {
+  fill: currentColor;
+  stroke: currentColor;
+  stroke-width: 1;
+  transition: all 0.2s ease;
+}
+
+.star.empty svg path {
+  fill: transparent;
+}
