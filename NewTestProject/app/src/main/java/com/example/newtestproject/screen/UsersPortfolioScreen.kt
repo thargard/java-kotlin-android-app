@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -31,44 +30,44 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.newtestproject.R
 import com.example.newtestproject.RetrofitClient
-import com.example.newtestproject.model.Order
-import com.example.newtestproject.model.OrderStatus
+import com.example.newtestproject.model.Product
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
 data class PortfolioUserEntry(
     val userId: Long,
+    val sellerKey: String,
     val label: String,
-    val completedCount: Int
+    val productCount: Int
 )
 
 @Composable
 fun UsersPortfolioScreen(
     onGoToOrders: () -> Unit,
-    onOpenUserPortfolio: (Long, String) -> Unit
+    onOpenUserPortfolio: (Long, String, String) -> Unit
 ) {
     var entries by remember { mutableStateOf<List<PortfolioUserEntry>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(Unit) {
-        RetrofitClient.api.getAllOrders()
-            .enqueue(object : Callback<List<Order>> {
+        RetrofitClient.api.getProducts(size = 200)
+            .enqueue(object : Callback<com.example.newtestproject.model.ProductPageResponse> {
                 override fun onResponse(
-                    call: Call<List<Order>>,
-                    response: Response<List<Order>>
+                    call: Call<com.example.newtestproject.model.ProductPageResponse>,
+                    response: Response<com.example.newtestproject.model.ProductPageResponse>
                 ) {
                     isLoading = false
                     if (response.isSuccessful) {
-                        val orders = response.body() ?: emptyList()
-                        entries = buildPortfolioEntries(orders)
+                        val products = response.body()?.content ?: emptyList()
+                        entries = buildPortfolioEntries(products)
                     } else {
                         errorMessage = "Error loading portfolios: ${response.code()}"
                     }
                 }
 
-                override fun onFailure(call: Call<List<Order>>, t: Throwable) {
+                override fun onFailure(call: Call<com.example.newtestproject.model.ProductPageResponse>, t: Throwable) {
                     isLoading = false
                     errorMessage = "Network error: ${t.message}"
                 }
@@ -118,7 +117,9 @@ fun UsersPortfolioScreen(
                     items(entries) { entry ->
                         PortfolioUserCard(
                             entry = entry,
-                            onClick = { onOpenUserPortfolio(entry.userId, entry.label) }
+                            onClick = {
+                                onOpenUserPortfolio(entry.userId, entry.label, entry.sellerKey)
+                            }
                         )
                     }
                 }
@@ -149,7 +150,7 @@ private fun PortfolioUserCard(
                 fontWeight = FontWeight.Medium
             )
             Text(
-                text = stringResource(id = R.string.completed_works_count, entry.completedCount),
+                text = stringResource(id = R.string.products_count, entry.productCount),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -157,25 +158,34 @@ private fun PortfolioUserCard(
     }
 }
 
-private fun buildPortfolioEntries(orders: List<Order>): List<PortfolioUserEntry> {
-    val grouped = orders.groupBy { order ->
-        order.userId ?: order.user?.id
+private fun buildPortfolioEntries(products: List<Product>): List<PortfolioUserEntry> {
+    val grouped = products.groupBy { product ->
+        product.seller?.login
+            ?: product.seller?.email
+            ?: product.sellerName
+            ?: product.sellerId?.toString()
+            ?: "unknown"
     }
 
     return grouped
-        .filterKeys { it != null }
-        .map { (userId, userOrders) ->
-            val safeUserId = userId ?: 0L
-            val label = userOrders
-                .mapNotNull { it.user?.login ?: it.user?.email }
+        .map { (sellerKey, sellerProducts) ->
+            val safeSellerId = sellerProducts.firstOrNull()?.sellerId ?: -1L
+            val label = sellerProducts
+                .mapNotNull { product ->
+                    product.seller?.fullName
+                        ?: product.seller?.login
+                        ?: product.seller?.email
+                        ?: product.sellerName
+                }
                 .firstOrNull()
-                ?: "ID: $safeUserId"
-            val completedCount = userOrders.count { it.status == OrderStatus.COMPLETED }
+                ?: if (sellerKey != "unknown") sellerKey else "Unknown seller"
+            val productCount = sellerProducts.size
             PortfolioUserEntry(
-                userId = safeUserId,
+                userId = safeSellerId,
+                sellerKey = sellerKey,
                 label = label,
-                completedCount = completedCount
+                productCount = productCount
             )
         }
-        .sortedByDescending { it.completedCount }
+        .sortedByDescending { it.productCount }
 }
