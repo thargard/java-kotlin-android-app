@@ -97,4 +97,8 @@
     <string name="invalid_price">Invalid price</string>
     <string name="fill_required_fields">Fill required fields</string>
     <string name="back">Back</string>
+    <string name="rating_with_count">Rating: %1$.1f (%2$d)</string>
+    <string name="rating_empty">Rating: no ratings</string>
+    <string name="rate_user">Rate</string>
+    <string name="rating_loading">Loading rating...</string>
 </resources>

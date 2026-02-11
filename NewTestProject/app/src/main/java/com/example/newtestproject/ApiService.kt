@@ -5,6 +5,9 @@ import com.example.newtestproject.model.ServerAuthResponse
 import com.example.newtestproject.model.Order
 import com.example.newtestproject.model.Product
 import com.example.newtestproject.model.ProductPageResponse
+import com.example.newtestproject.model.RatingStats
+import com.example.newtestproject.model.RatingResponse
+import com.example.newtestproject.model.RatingRequest
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -62,4 +65,21 @@ interface ApiService {
         @Header("Authorization") authorization: String,
         @Path("id") id: Long
     ): Call<Map<String, Any>>
+
+    @POST("/api/ratings")
+    fun createOrUpdateRating(
+        @Header("customerId") customerId: Long,
+        @Body body: RatingRequest
+    ): Call<RatingResponse>
+
+    @GET("/api/ratings/customer/{customerId}/producer/{producerId}")
+    fun getRatingByCustomerAndProducer(
+        @Path("customerId") customerId: Long,
+        @Path("producerId") producerId: Long
+    ): Call<RatingResponse>
+
+    @GET("/api/ratings/producer/{producerId}/stats")
+    fun getProducerRatingStats(
+        @Path("producerId") producerId: Long
+    ): Call<RatingStats>
 }

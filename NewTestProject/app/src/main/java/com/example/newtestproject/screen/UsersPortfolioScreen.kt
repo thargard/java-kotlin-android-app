@@ -169,7 +169,9 @@ private fun buildPortfolioEntries(products: List<Product>): List<PortfolioUserEn
 
     return grouped
         .map { (sellerKey, sellerProducts) ->
-            val safeSellerId = sellerProducts.firstOrNull()?.sellerId ?: -1L
+            val safeSellerId = sellerProducts.firstOrNull()?.seller?.id
+                ?: sellerProducts.firstOrNull()?.sellerId
+                ?: -1L
             val label = sellerProducts
                 .mapNotNull { product ->
                     product.seller?.fullName

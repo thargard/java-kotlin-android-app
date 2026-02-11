@@ -261,7 +261,7 @@ fun AuthScreen(
                     } else if (password != repeatPassword) {
                         errorMessage = "Passwords do not match!"
                     } else {
-                        val user = User(login, password, email, fullName, selectedRole)
+                        val user = User(id = null, login, password, email, fullName, selectedRole)
                         RetrofitClient.api.register(user).enqueue(object : Callback<ServerAuthResponse> {
                             override fun onResponse(call: Call<ServerAuthResponse>, response: Response<ServerAuthResponse>) {
                                 if (response.isSuccessful) {

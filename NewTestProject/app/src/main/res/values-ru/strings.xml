@@ -97,4 +97,8 @@
     <string name="invalid_price">Неверная цена</string>
     <string name="fill_required_fields">Заполните обязательные поля</string>
     <string name="back">Назад</string>
+    <string name="rating_with_count">Рейтинг: %1$.1f (%2$d)</string>
+    <string name="rating_empty">Рейтинг: нет оценок</string>
+    <string name="rate_user">Оценка</string>
+    <string name="rating_loading">Грузим рейтинг...</string>
 </resources>
