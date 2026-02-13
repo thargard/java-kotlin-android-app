@@ -22,6 +22,9 @@ public class MessageService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private WebSocketNotificationService webSocketNotificationService;
+
     /**
      * Отправить сообщение от одного пользователя другому
      */
@@ -43,7 +46,9 @@ public class MessageService {
         Message message = new Message(sender, receiver, content);
         message = messageRepository.save(message);
 
-        return MessageDTO.fromEntity(message);
+        MessageDTO dto = MessageDTO.fromEntity(message);
+        webSocketNotificationService.notifyUsers(dto);
+        return dto;
     }
 
     /**
