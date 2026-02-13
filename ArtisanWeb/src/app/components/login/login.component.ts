@@ -22,7 +22,7 @@ export class LoginComponent {
   constructor(
     private authService: AuthService,
     private router: Router,
-    private translate: TranslateService
+    private translate: TranslateService,
   ) {}
 
   onSubmit() {
@@ -80,7 +80,7 @@ export class LoginComponent {
       // @ts-ignore
       google.accounts.id.renderButton(
         document.getElementById('googleSignInButton'),
-        { theme: 'outline', size: 'large' }
+        { theme: 'outline', size: 'large' },
       );
     }
   }
