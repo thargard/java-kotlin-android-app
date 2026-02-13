@@ -1,8 +1,8 @@
 package example.com.server.controller;
 
+import example.com.server.dto.MessageDTO;
 import example.com.server.model.CartItem;
 import example.com.server.model.Product;
-import example.com.server.model.User;
 import example.com.server.service.CartService;
 import example.com.server.service.JwtService;
 import example.com.server.service.MessageService;
@@ -16,7 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -267,6 +266,10 @@ public class ProductController {
         return ResponseEntity.ok(response);
     }
 
+    /**
+     * Связаться с продавцом продукта
+     * POST /api/products/{id}/contact
+     */
     @PostMapping("/{id}/contact")
     public ResponseEntity<?> contactSeller(
             @RequestHeader(value = "Authorization", required = false) String authorization,
@@ -293,24 +296,32 @@ public class ProductController {
                     .body(Map.of("error", "You cannot contact yourself"));
         }
 
-        String message = "Hi, I'm interested in your product: " + product.getName();
-        if (body.get("message") != null) {
-            message = body.get("message").toString();
+        // Формируем сообщение
+        String messageContent = "Hi, I'm interested in your product: " + product.getName();
+        if (body.get("message") != null && !body.get("message").toString().isBlank()) {
+            messageContent = body.get("message").toString();
         }
 
-        // Start a conversation
-        var firstMessage = messageService.startConversation(userId, sellerId, id, message);
+        try {
+            // Отправляем сообщение продавцу (новый API без threadId и productId)
+            MessageDTO sentMessage = messageService.sendMessage(userId, sellerId, messageContent);
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("message", "Chat started with seller");
-        response.put("threadId", firstMessage.getThreadId());
-        response.put("productId", id);
-        response.put("sellerId", sellerId);
-        response.put("sellerName", product.getSeller().getFullName() != null ? product.getSeller().getFullName() : product.getSeller().getLogin());
-        response.put("messageId", firstMessage.getId());
-        response.put("createdAt", firstMessage.getCreatedAt());
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Message sent to seller");
+            response.put("sellerId", sellerId);
+            response.put("sellerName", product.getSeller().getFullName() != null
+                    ? product.getSeller().getFullName()
+                    : product.getSeller().getLogin());
+            response.put("messageId", sentMessage.getId());
+            response.put("productId", id);
+            response.put("productName", product.getName());
+            response.put("createdAt", sentMessage.getCreatedAt());
 
-        return ResponseEntity.ok(response);
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", ex.getMessage()));
+        }
     }
 
     private Map<String, Object> productToMap(Product product) {

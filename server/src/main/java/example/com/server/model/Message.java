@@ -22,13 +22,6 @@ public class Message {
     @Column(name = "content", nullable = false, length = 2000)
     private String content;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id", nullable = true)
-    private Product product;
-
-    @Column(name = "thread_id", nullable = true)
-    private Long threadId;
-
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 
@@ -39,11 +32,10 @@ public class Message {
         this.createdAt = Instant.now();
     }
 
-    public Message(User sender, User receiver, String content, Product product) {
+    public Message(User sender, User receiver, String content) {
         this.sender = sender;
         this.receiver = receiver;
         this.content = content;
-        this.product = product;
         this.createdAt = Instant.now();
         this.isRead = false;
     }
@@ -85,22 +77,6 @@ public class Message {
 
     public void setContent(String content) {
         this.content = content;
-    }
-
-    public Product getProduct() {
-        return product;
-    }
-
-    public void setProduct(Product product) {
-        this.product = product;
-    }
-
-    public Long getThreadId() {
-        return threadId;
-    }
-
-    public void setThreadId(Long threadId) {
-        this.threadId = threadId;
     }
 
     public Instant getCreatedAt() {
