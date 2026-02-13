@@ -1,67 +1,71 @@
-<div class="w-full max-w-2xl px-4 mx-auto">
-  <div class="mt-6 mb-6">
-    <h1 class="text-2xl font-semibold tracking-tight text-gray-900">
-      {{ "messages.title" | translate }}
-    </h1>
-    <p class="mt-1 text-sm text-gray-600">
-      {{ "messages.subtitle" | translate }}
-    </p>
+<!-- src/app/components/messages/messages.component.html -->
+
+<div class="messages-container">
+  <div class="messages-header">
+    <h1>Сообщения</h1>
+    <span *ngIf="getTotalUnreadCount() > 0" class="unread-badge">
+      {{ getTotalUnreadCount() }}
+    </span>
   </div>
 
-  <div *ngIf="loading" class="p-6 bg-white border border-gray-200 rounded-xl shadow-sm">
-    <div class="animate-pulse space-y-3">
-      <div class="h-4 bg-gray-200 rounded w-2/3"></div>
-      <div class="h-4 bg-gray-200 rounded w-1/2"></div>
-      <div class="h-4 bg-gray-200 rounded w-3/4"></div>
-    </div>
+  <!-- Загрузка -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Загрузка диалогов...</p>
   </div>
 
-  <div *ngIf="!loading && error" class="p-6 bg-white border border-red-200 rounded-xl text-sm text-red-700">
-    {{ error | translate }}
-    <button
-      (click)="loadThreads()"
-      class="mt-3 px-3 py-2 text-sm font-medium rounded-lg bg-red-600 text-white hover:bg-red-700"
-    >
-      {{ "orders.retry" | translate }}
+  <!-- Ошибка -->
+  <div *ngIf="error && !loading" class="error-container">
+    <p>{{ error }}</p>
+    <button class="retry-button" (click)="loadConversations()">
+      Попробовать снова
     </button>
   </div>
 
-  <div *ngIf="!loading && !error && conversations.length === 0" class="p-6 bg-white border border-gray-200 rounded-xl text-sm text-gray-600">
-    {{ "messages.empty" | translate }}
-  </div>
+  <!-- Список диалогов -->
+  <div *ngIf="!loading && !error" class="conversations-list">
+    <!-- Пустое состояние -->
+    <div *ngIf="conversations.length === 0" class="empty-state">
+      <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+      </svg>
+      <h3>Нет диалогов</h3>
+      <p>Начните общение с исполнителями или заказчиками</p>
+    </div>
 
-  <div *ngIf="!loading && !error && conversations.length > 0" class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
-    <ul class="divide-y divide-gray-100">
-      <li *ngFor="let conv of conversations">
-        <div
-          (click)="openChat(conv.threadId)"
-          role="button"
-          tabindex="0"
-          class="flex items-center gap-4 p-4 hover:bg-gray-50/70 transition cursor-pointer"
-        >
-          <div class="h-10 w-10 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-sm font-medium shrink-0">
-            {{ conv.otherPartyName[0] | uppercase }}
+    <!-- Список -->
+    <div *ngIf="conversations.length > 0" class="conversation-items">
+      <div 
+        *ngFor="let conversation of conversations" 
+        class="conversation-item"
+        [class.unread]="conversation.unreadCount > 0"
+        (click)="openConversation(conversation.otherUserId)">
+        
+        <!-- Аватар -->
+        <div class="conversation-avatar">
+          <div class="avatar-placeholder">
+            {{ conversation.otherUserName.charAt(0).toUpperCase() }}
           </div>
-          <div class="min-w-0 flex-1">
-            <div class="flex items-center gap-2">
-              <span class="font-medium text-gray-900 truncate">
-                <a *ngIf="conv.otherPartyId" [routerLink]="['/users', conv.otherPartyId]" class="text-gray-900 hover:text-indigo-600 hover:underline" (click)="$event.stopPropagation()">{{ conv.otherPartyName }}</a>
-                <span *ngIf="!conv.otherPartyId">{{ conv.otherPartyName }}</span>
-              </span>
-              <span *ngIf="conv.unreadCount > 0" class="shrink-0 px-2 py-0.5 text-xs font-medium bg-indigo-600 text-white rounded-full">
-                {{ conv.unreadCount }}
-              </span>
-            </div>
-            <p class="text-sm text-gray-600 truncate">{{ conv.lastMessage }}</p>
-          </div>
-          <div class="text-xs text-gray-500 shrink-0">
-            {{ conv.lastMessageAt | date: "short" }}
-          </div>
-          <svg class="w-5 h-5 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-          </svg>
         </div>
-      </li>
-    </ul>
+
+        <!-- Контент -->
+        <div class="conversation-content">
+          <div class="conversation-header">
+            <h3 class="conversation-name">{{ conversation.otherUserName }}</h3>
+            <span class="conversation-time">{{ getTimeAgo(conversation.lastMessageAt) }}</span>
+          </div>
+          
+          <div class="conversation-preview">
+            <p class="last-message">
+              <span *ngIf="conversation.isLastMessageFromMe" class="message-prefix">Вы: </span>
+              {{ truncateMessage(conversation.lastMessage) }}
+            </p>
+            <span *ngIf="conversation.unreadCount > 0" class="unread-count">
+              {{ conversation.unreadCount }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

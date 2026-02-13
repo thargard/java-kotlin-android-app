@@ -92,26 +92,29 @@ export class OrderDetailComponent implements OnInit {
     if (currentUser?.id === this.order.user.id) {
       return; // не начинаем чат с самим собой
     }
+    
     this.chatLoading = true;
+    
+    // Формируем сообщение
     const content = this.order.description
       ? `Здравствуйте! Вопрос по заказу #${this.order.id}: ${this.order.description.slice(0, 100)}`
       : `Здравствуйте! Вопрос по заказу #${this.order.id}.`;
-    this.messageService
-      .startConversation(this.order.user.id, content, null)
-      .subscribe({
-        next: (res) => {
-          this.chatLoading = false;
-          const threadId = (res as { threadId?: number }).threadId;
-          if (threadId != null) {
-            this.router.navigate(['/chat', threadId]);
-          } else {
-            this.router.navigate(['/profile']);
-          }
-        },
-        error: () => {
-          this.chatLoading = false;
-        },
-      });
+    
+    // Используем новый API - отправляем сообщение напрямую
+    this.messageService.sendMessage({
+      receiverId: this.order.user.id,
+      content: content
+    }).subscribe({
+      next: (message) => {
+        this.chatLoading = false;
+        // Переходим в чат с пользователем по его ID
+        this.router.navigate(['/chat', this.order!.user!.id]);
+      },
+      error: (err) => {
+        console.error('Error sending message:', err);
+        this.chatLoading = false;
+      },
+    });
   }
 
   canStartChat(): boolean {

@@ -22,7 +22,7 @@ export const routes: Routes = [
   // Заказы
   { path: 'orders/:id', component: OrderDetailComponent },
   // Чат
-  { path: 'chat/:threadId', component: ChatComponent },
+  { path: 'chat/:userId', component: ChatComponent },
   // Сообщения (список диалогов)
   { path: 'messages', component: MessagesComponent },
   // Объявления

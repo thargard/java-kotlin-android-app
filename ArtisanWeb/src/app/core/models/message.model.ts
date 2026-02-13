@@ -1,19 +1,39 @@
+// src/app/core/models/message.model.ts
+
 export interface MessageDto {
   id: number;
   senderId: number;
-  senderName?: string;
+  senderName: string;
   receiverId: number;
-  receiverName?: string;
+  receiverName: string;
   content: string;
-  threadId: number | null;
-  productId: number | null;
   createdAt: string;
   isRead: boolean;
 }
 
-export interface StartConversationResponse {
-  id: number;
-  threadId: number | null;
-  message?: string;
-  [key: string]: unknown;
+export interface ConversationDto {
+  otherUserId: number;
+  otherUserName: string;
+  lastMessage: string;
+  lastMessageAt: string;
+  unreadCount: number;
+  isLastMessageFromMe: boolean;
+}
+
+export interface SendMessageRequest {
+  receiverId: number;
+  content: string;
+}
+
+export interface ConversationResponse {
+  otherUserId: number;
+  messages: MessageDto[];
+}
+
+export interface ConversationsResponse {
+  conversations: ConversationDto[];
+}
+
+export interface UnreadCountResponse {
+  unreadCount: number;
 }
