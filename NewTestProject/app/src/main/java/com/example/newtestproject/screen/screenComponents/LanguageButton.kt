@@ -10,12 +10,15 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.ui.res.stringResource
 import com.example.newtestproject.R
 import com.example.newtestproject.components.currentActivity
 import com.example.newtestproject.util.LanguageManager
 
 @Composable
-fun LanguageButton() {
+fun LanguageButton(
+
+) {
     val activity = currentActivity()
     val context = LocalContext.current
     var showDialog by remember { mutableStateOf(false) }
@@ -27,7 +30,7 @@ fun LanguageButton() {
     if (showDialog) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
-            title = { Text(text = context.getString(R.string.choose_language)) },
+            title = { Text(text = stringResource(R.string.choose_language)) },
             text = {
                 Column {
                     TextButton(onClick = {
@@ -43,7 +46,7 @@ fun LanguageButton() {
                     TextButton(onClick = {
                         LanguageManager.applyLanguage(activity ?: context, null)
                         showDialog = false
-                    }) { Text(context.getString(R.string.follow_system)) }
+                    }) { Text(stringResource(R.string.follow_system)) }
                 }
             },
             confirmButton = {}

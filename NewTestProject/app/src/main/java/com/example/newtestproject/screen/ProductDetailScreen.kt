@@ -42,7 +42,15 @@ import retrofit2.Response
 @Composable
 fun ProductDetailScreen(
     productId: Long,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onOpenChat: (Long, String?) -> Unit,
+    unknownErrorMessage: String = stringResource(R.string.unknownError),
+    networkErrorMessage: String = stringResource(R.string.network_error),
+    loginRequiredMessage: String = stringResource(R.string.login_required),
+    purchaseSuccessMessage: String = stringResource(R.string.purchase_success),
+    purchaseFailMessage: String = stringResource(R.string.purchase_failed),
+    couldNotOpenChatMessage: String = stringResource(R.string.chat_open_failed),
+    productAddedToCartMessage: String = stringResource(R.string.product_added_to_cart),
 ) {
     var product by remember { mutableStateOf<Product?>(null) }
     var isLoading by remember { mutableStateOf(true) }
@@ -61,13 +69,13 @@ fun ProductDetailScreen(
                     if (response.isSuccessful) {
                         product = response.body()
                     } else {
-                        errorMessage = "${context.getString(R.string.unknownError)}: ${response.code()}"
+                        errorMessage = "${unknownErrorMessage}: ${response.code()}"
                     }
                 }
 
                 override fun onFailure(call: Call<Product>, t: Throwable) {
                     isLoading = false
-                    errorMessage = "${context.getString(R.string.network_error)}: ${t.message}"
+                    errorMessage = "${networkErrorMessage}: ${t.message}"
                 }
             })
     }
@@ -77,7 +85,7 @@ fun ProductDetailScreen(
             title = stringResource(id = R.string.buy),
             onConfirm = {
                 if (authHeader == null) {
-                    Toast.makeText(context, context.getString(R.string.login_required), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, loginRequiredMessage, Toast.LENGTH_SHORT).show()
                 } else {
                     RetrofitClient.api.buyProduct(authHeader, productId)
                         .enqueue(object : Callback<Map<String, Any>> {
@@ -86,14 +94,14 @@ fun ProductDetailScreen(
                                 response: Response<Map<String, Any>>
                             ) {
                                 if (response.isSuccessful) {
-                                    Toast.makeText(context, context.getString(R.string.purchase_success), Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, purchaseSuccessMessage, Toast.LENGTH_SHORT).show()
                                 } else {
-                                    Toast.makeText(context, context.getString(R.string.purchase_failed), Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, purchaseFailMessage, Toast.LENGTH_SHORT).show()
                                 }
                             }
 
                             override fun onFailure(call: Call<Map<String, Any>>, t: Throwable) {
-                                Toast.makeText(context, context.getString(R.string.purchase_failed), Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, purchaseFailMessage, Toast.LENGTH_SHORT).show()
                             }
                         })
                 }
@@ -138,6 +146,11 @@ fun ProductDetailScreen(
             }
             else -> {
                 val available = product?.isAvailable == true
+                val sellerId = product?.seller?.id ?: product?.sellerId
+                val sellerLabel = product?.seller?.fullName
+                    ?: product?.seller?.login
+                    ?: product?.seller?.email
+                    ?: product?.sellerName
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
@@ -185,10 +198,6 @@ fun ProductDetailScreen(
                             )
                         }
                         Spacer(modifier = Modifier.height(8.dp))
-                        val sellerLabel = product?.seller?.fullName
-                            ?: product?.seller?.login
-                            ?: product?.seller?.email
-                            ?: product?.sellerName
                         sellerLabel?.let { seller ->
                             Text(
                                 text = stringResource(id = R.string.user) + ": $seller",
@@ -198,8 +207,29 @@ fun ProductDetailScreen(
                     }
                 }
 
+                Spacer(modifier = Modifier.height(16.dp))
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Button(
+                        onClick = {
+                            if (authHeader == null) {
+                                Toast.makeText(context, loginRequiredMessage, Toast.LENGTH_SHORT).show()
+                            } else if (sellerId == null) {
+                                Toast.makeText(context, couldNotOpenChatMessage, Toast.LENGTH_SHORT).show()
+                            } else {
+                                onOpenChat(sellerId, sellerLabel)
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(stringResource(id = R.string.write_to_seller))
+                    }
+                }
+
                 if (available) {
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
                     Column(
                         verticalArrangement = Arrangement.spacedBy(8.dp),
                         modifier = Modifier.fillMaxWidth()
@@ -207,7 +237,7 @@ fun ProductDetailScreen(
                         Button(
                             onClick = {
                                 if (authHeader == null) {
-                                    Toast.makeText(context, context.getString(R.string.login_required), Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, loginRequiredMessage, Toast.LENGTH_SHORT).show()
                                 } else {
                                     showPaymentDialog = true
                                 }
@@ -219,7 +249,7 @@ fun ProductDetailScreen(
                         Button(
                             onClick = {
                                 if (authHeader == null) {
-                                    Toast.makeText(context, context.getString(R.string.login_required), Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, loginRequiredMessage, Toast.LENGTH_SHORT).show()
                                 } else {
                                     product?.let { CartStore.add(it) }
                                     RetrofitClient.api.addProductToCart(authHeader, productId)
@@ -235,7 +265,7 @@ fun ProductDetailScreen(
                                                 // no-op
                                             }
                                         })
-                                    Toast.makeText(context, context.getString(R.string.product_added_to_cart), Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, productAddedToCartMessage, Toast.LENGTH_SHORT).show()
                                 }
                             },
                             modifier = Modifier.fillMaxWidth()

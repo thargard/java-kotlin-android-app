@@ -53,7 +53,10 @@ fun UserPortfolioScreen(
     userLabel: String,
     sellerKey: String,
     onBackToPortfolios: () -> Unit,
-    onOpenProduct: (Long) -> Unit
+    onOpenProduct: (Long) -> Unit,
+    unknownErrorMessage: String = stringResource(R.string.unknownError),
+    networkErrorMessage: String = stringResource(R.string.network_error),
+    saveMessage: String = stringResource(R.string.save)
 ) {
     var products by remember { mutableStateOf<List<Product>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
@@ -256,14 +259,14 @@ fun UserPortfolioScreen(
                                                 loadRatingStats()
                                                 Toast.makeText(
                                                     context,
-                                                    context.getString(R.string.save),
+                                                    saveMessage,
                                                     Toast.LENGTH_SHORT
                                                 ).show()
                                             } else {
                                                 myRatingError = "Error saving rating: ${response.code()}"
                                                 Toast.makeText(
                                                     context,
-                                                    myRatingError ?: context.getString(R.string.unknownError),
+                                                    myRatingError ?: unknownErrorMessage,
                                                     Toast.LENGTH_SHORT
                                                 ).show()
                                             }
@@ -274,7 +277,7 @@ fun UserPortfolioScreen(
                                             myRatingError = "Network error: ${t.message}"
                                             Toast.makeText(
                                                 context,
-                                                myRatingError ?: context.getString(R.string.network_error),
+                                                myRatingError ?: networkErrorMessage,
                                                 Toast.LENGTH_SHORT
                                             ).show()
                                         }

@@ -101,4 +101,16 @@
     <string name="rating_empty">Рейтинг: нет оценок</string>
     <string name="rate_user">Оценка</string>
     <string name="rating_loading">Грузим рейтинг...</string>
+    <string name="messages">Сообщения</string>
+    <string name="messages_title">Сообщения</string>
+    <string name="messages_empty">Пока нет диалогов</string>
+    <string name="chat_with">Чат с</string>
+    <string name="write_to_seller">Написать продавцу</string>
+    <string name="type_message">Написать сообщение</string>
+    <string name="send">Отправить</string>
+    <string name="send_failed">Ошибка отправления сообщения</string>
+    <string name="unread">Непрочитано</string>
+    <string name="chat_open_failed">Невозможно открыть чат</string>
+    <string name="not_connected">Нет подключения</string>
+    <string name="new_messages">Новые сообщения</string>
 </resources>

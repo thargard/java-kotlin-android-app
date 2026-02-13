@@ -8,11 +8,17 @@ import com.example.newtestproject.model.ProductPageResponse
 import com.example.newtestproject.model.RatingStats
 import com.example.newtestproject.model.RatingResponse
 import com.example.newtestproject.model.RatingRequest
+import com.example.newtestproject.model.ConversationsResponse
+import com.example.newtestproject.model.ConversationMessagesResponse
+import com.example.newtestproject.model.MessageDto
+import com.example.newtestproject.model.SendMessageRequest
+import com.example.newtestproject.model.UnreadCountResponse
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
+import retrofit2.http.PATCH
 import retrofit2.http.Query
 import retrofit2.http.Header
 
@@ -82,4 +88,32 @@ interface ApiService {
     fun getProducerRatingStats(
         @Path("producerId") producerId: Long
     ): Call<RatingStats>
+
+    @GET("/api/messages/conversations")
+    fun getConversations(
+        @Header("Authorization") authorization: String
+    ): Call<ConversationsResponse>
+
+    @GET("/api/messages/conversation/{otherUserId}")
+    fun getConversation(
+        @Header("Authorization") authorization: String,
+        @Path("otherUserId") otherUserId: Long
+    ): Call<ConversationMessagesResponse>
+
+    @POST("/api/messages/send")
+    fun sendMessage(
+        @Header("Authorization") authorization: String,
+        @Body body: SendMessageRequest
+    ): Call<MessageDto>
+
+    @PATCH("/api/messages/{messageId}/read")
+    fun markMessageAsRead(
+        @Header("Authorization") authorization: String,
+        @Path("messageId") messageId: Long
+    ): Call<Map<String, Any>>
+
+    @GET("/api/messages/unread/count")
+    fun getUnreadCount(
+        @Header("Authorization") authorization: String
+    ): Call<UnreadCountResponse>
 }

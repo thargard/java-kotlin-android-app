@@ -37,7 +37,9 @@ import retrofit2.Response
 
 @Composable
 fun CartScreen(
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    loginRequiredMessage: String = stringResource(R.string.login_required),
+    purchaseSuccessMessage: String = stringResource(R.string.purchase_success)
 ) {
     val items = CartStore.items
     val showPaymentDialog = remember { mutableStateOf(false) }
@@ -50,7 +52,7 @@ fun CartScreen(
             title = stringResource(id = R.string.buy_all),
             onConfirm = {
                 if (authHeader == null) {
-                    Toast.makeText(context, context.getString(R.string.login_required), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, loginRequiredMessage, Toast.LENGTH_SHORT).show()
                 } else {
                     items
                         .filter { it.product.isAvailable == true }
@@ -71,7 +73,7 @@ fun CartScreen(
                                 })
                         }
                     CartStore.clear()
-                    Toast.makeText(context, context.getString(R.string.purchase_success), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, purchaseSuccessMessage, Toast.LENGTH_SHORT).show()
                 }
                 showPaymentDialog.value = false
             },

@@ -101,4 +101,16 @@
     <string name="rating_empty">Rating: no ratings</string>
     <string name="rate_user">Rate</string>
     <string name="rating_loading">Loading rating...</string>
+    <string name="messages">Messages</string>
+    <string name="messages_title">Messages</string>
+    <string name="messages_empty">No conversations yet</string>
+    <string name="chat_with">Chat with</string>
+    <string name="write_to_seller">Write to seller</string>
+    <string name="type_message">Type a message</string>
+    <string name="send">Send</string>
+    <string name="send_failed">Failed to send message</string>
+    <string name="unread">Unread</string>
+    <string name="chat_open_failed">Could not open chat</string>
+    <string name="not_connected">Not connected</string>
+    <string name="new_messages">New messages</string>
 </resources>

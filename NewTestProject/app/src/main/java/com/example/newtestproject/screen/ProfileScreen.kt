@@ -24,7 +24,14 @@ import com.example.newtestproject.model.RatingStats
 
 @Composable
 fun ProfileScreen(
-    onLogout: () -> Unit
+    onLogout: () -> Unit,
+    unknownErrorMessage: String = stringResource(R.string.unknownError),
+    networkErrorMessage: String = stringResource(R.string.network_error),
+    loginRequiredMessage: String = stringResource(R.string.login_required),
+    fillFieldsMessage: String = stringResource(R.string.fill_required_fields),
+    productCreatedMessage: String = stringResource(R.string.product_created),
+    productCreatFailedMessage: String = stringResource(R.string.product_create_failed),
+    invalidPriceMessage: String = stringResource(R.string.product_create_failed)
 ) {
     var orders by remember { mutableStateOf<List<Order>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
@@ -42,10 +49,10 @@ fun ProfileScreen(
     LaunchedEffect(Unit) {
         val userId = payload?.id
         if (userId == null) {
-            errorMessage = context.getString(R.string.unknownError)
+            errorMessage = unknownErrorMessage
             isLoading = false
             ratingLoading = false
-            ratingError = context.getString(R.string.unknownError)
+            ratingError = unknownErrorMessage
             return@LaunchedEffect
         }
 
@@ -59,13 +66,13 @@ fun ProfileScreen(
                     if (response.isSuccessful) {
                         orders = response.body() ?: emptyList()
                     } else {
-                        errorMessage = "${context.getString(R.string.unknownError)}: ${response.code()}"
+                        errorMessage = "${unknownErrorMessage}: ${response.code()}"
                     }
                 }
 
                 override fun onFailure(call: Call<List<Order>>, t: Throwable) {
                     isLoading = false
-                    errorMessage = "${context.getString(R.string.network_error)}: ${t.message}"
+                    errorMessage = "${networkErrorMessage}: ${t.message}"
                 }
             })
 
@@ -79,13 +86,13 @@ fun ProfileScreen(
                     if (response.isSuccessful) {
                         ratingStats = response.body()
                     } else {
-                        ratingError = "${context.getString(R.string.unknownError)}: ${response.code()}"
+                        ratingError = "${unknownErrorMessage}: ${response.code()}"
                     }
                 }
 
                 override fun onFailure(call: Call<RatingStats>, t: Throwable) {
                     ratingLoading = false
-                    ratingError = "${context.getString(R.string.network_error)}: ${t.message}"
+                    ratingError = "${networkErrorMessage}: ${t.message}"
                 }
             })
     }
@@ -95,16 +102,16 @@ fun ProfileScreen(
             onDismiss = { showCreateDialog = false },
             onSubmit = { name, priceText, category, description, imageUrl ->
                 if (authHeader == null) {
-                    Toast.makeText(context, context.getString(R.string.login_required), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, loginRequiredMessage, Toast.LENGTH_SHORT).show()
                     return@CreateProductDialog
                 }
                 if (name.isBlank() || category.isBlank()) {
-                    Toast.makeText(context, context.getString(R.string.fill_required_fields), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, fillFieldsMessage, Toast.LENGTH_SHORT).show()
                     return@CreateProductDialog
                 }
                 val price = priceText.toDoubleOrNull()
                 if (price == null || price <= 0.0) {
-                    Toast.makeText(context, context.getString(R.string.invalid_price), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, invalidPriceMessage, Toast.LENGTH_SHORT).show()
                     return@CreateProductDialog
                 }
 
@@ -123,15 +130,15 @@ fun ProfileScreen(
                             response: Response<com.example.newtestproject.model.Product>
                         ) {
                             if (response.isSuccessful) {
-                                Toast.makeText(context, context.getString(R.string.product_created), Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, productCreatedMessage, Toast.LENGTH_SHORT).show()
                                 showCreateDialog = false
                             } else {
-                                Toast.makeText(context, context.getString(R.string.product_create_failed), Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, productCreatFailedMessage, Toast.LENGTH_SHORT).show()
                             }
                         }
 
                         override fun onFailure(call: Call<com.example.newtestproject.model.Product>, t: Throwable) {
-                            Toast.makeText(context, context.getString(R.string.product_create_failed), Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, productCreatFailedMessage, Toast.LENGTH_SHORT).show()
                         }
                     })
             }
