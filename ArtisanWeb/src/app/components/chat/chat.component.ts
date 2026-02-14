@@ -50,12 +50,13 @@ export class ChatComponent implements OnInit, AfterViewChecked, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.currentUserId = this.authService.getCurrentUser()?.id || null;
+    this.currentUserId = this.authService.getCurrentUserId();
 
     this.route.params.subscribe((params) => {
       this.otherUserId = +params['userId'];
       console.log('Loaded chat with userId:', this.otherUserId);
       if (this.otherUserId) {
+        this.messageBadge.setActiveChatUserId(this.otherUserId);
         this.loadConversation();
         this.messageSocket.connect();
         this.socketSub = this.messageSocket.message$.subscribe((msg) => {
@@ -76,6 +77,7 @@ export class ChatComponent implements OnInit, AfterViewChecked, OnDestroy {
 
   ngOnDestroy(): void {
     this.socketSub?.unsubscribe();
+    this.messageBadge.setActiveChatUserId(null);
   }
 
   ngAfterViewChecked(): void {

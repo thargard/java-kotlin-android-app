@@ -33,9 +33,9 @@ export class MessagesComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadConversations();
-    this.messageSocket.connect(this.authService.getCurrentUser()?.id);
+    this.messageSocket.connect(this.authService.getCurrentUserId());
     this.socketSub = this.messageSocket.message$.subscribe((msg) => {
-      const me = this.authService.getCurrentUser()?.id;
+      const me = this.authService.getCurrentUserId();
       if (!me) return;
       const otherId = msg.senderId === me ? msg.receiverId : msg.senderId;
       if (!otherId) return;
@@ -44,15 +44,14 @@ export class MessagesComponent implements OnInit, OnDestroy {
       const existing = this.conversations.find(
         (c) => c.otherUserId === otherId,
       );
-      if (existing) {
-        existing.lastMessage = msg.content || '';
-        existing.lastMessageAt = msg.createdAt || existing.lastMessageAt;
-        existing.isLastMessageFromMe = msg.senderId === me;
-        if (msg.receiverId === me) {
-          existing.unreadCount = (existing.unreadCount || 0) + 1;
-          this.messageBadge.increment(1);
-        }
-      } else {
+        if (existing) {
+          existing.lastMessage = msg.content || '';
+          existing.lastMessageAt = msg.createdAt || existing.lastMessageAt;
+          existing.isLastMessageFromMe = msg.senderId === me;
+          if (msg.receiverId === me) {
+            existing.unreadCount = (existing.unreadCount || 0) + 1;
+          }
+        } else {
         this.conversations.unshift({
           otherUserId: otherId,
           otherUserName: otherName || `User ${otherId}`,
@@ -61,9 +60,7 @@ export class MessagesComponent implements OnInit, OnDestroy {
           unreadCount: msg.receiverId === me ? 1 : 0,
           isLastMessageFromMe: msg.senderId === me,
         });
-        if (msg.receiverId === me) {
-          this.messageBadge.increment(1);
-        }
+        // Global badge count is handled in AppComponent.
       }
       this.sortConversations();
     });

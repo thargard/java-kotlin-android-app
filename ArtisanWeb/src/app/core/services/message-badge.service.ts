@@ -8,6 +8,7 @@ import { MessageService } from './message.service';
 export class MessageBadgeService {
   private totalSubject = new BehaviorSubject<number>(0);
   total$ = this.totalSubject.asObservable();
+  private activeChatUserId: number | null = null;
 
   constructor(private messageService: MessageService) {}
 
@@ -30,5 +31,13 @@ export class MessageBadgeService {
 
   decrement(by: number = 1): void {
     this.totalSubject.next(Math.max(0, this.totalSubject.value - by));
+  }
+
+  setActiveChatUserId(userId: number | null): void {
+    this.activeChatUserId = userId;
+  }
+
+  getActiveChatUserId(): number | null {
+    return this.activeChatUserId;
   }
 }

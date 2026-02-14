@@ -55,17 +55,16 @@ export class AppComponent implements OnInit, OnDestroy {
     });
 
     this.socketSub = this.messageSocket.message$.subscribe((msg) => {
-      const me = this.authService.getCurrentUser()?.id;
-      if (msg.receiverId && (me == null || msg.receiverId === me)) {
-        this.messageBadge.increment(1);
+      const me = this.authService.getCurrentUserId();
+      if (!me || msg.receiverId !== me) return;
+      const activeChatUserId = this.messageBadge.getActiveChatUserId();
+      if (activeChatUserId != null && msg.senderId === activeChatUserId) {
+        return;
       }
+      this.messageBadge.increment(1);
     });
 
-    const token = this.authService.getToken();
-    if (token) {
-      this.messageSocket.connect();
-      this.messageBadge.refresh();
-    }
+    // Connect via currentUser$ to ensure we subscribe with a user id.
   }
 
   ngOnDestroy(): void {

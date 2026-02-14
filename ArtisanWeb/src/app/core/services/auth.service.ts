@@ -253,6 +253,29 @@ export class AuthService {
   }
 
   /**
+   * Return current user id, falling back to token payload if needed.
+   */
+  getCurrentUserId(): number | null {
+    const user = this.getCurrentUser();
+    if (user?.id != null) return user.id;
+
+    const token = this.getToken();
+    if (!token) return null;
+
+    try {
+      const payload = token.split('.')[1];
+      if (!payload) return null;
+      const normalized = payload.replace(/-/g, '+').replace(/_/g, '/');
+      const json = atob(normalized);
+      const data = JSON.parse(json);
+      const id = data?.id;
+      return typeof id === 'number' ? id : Number.isFinite(+id) ? +id : null;
+    } catch {
+      return null;
+    }
+  }
+
+  /**
    * Сохранить текущего пользователя
    */
   private setCurrentUser(user: User): void {
