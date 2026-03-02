@@ -9,6 +9,7 @@ import example.com.server.service.MessageService;
 import example.com.server.service.OrderService;
 import example.com.server.service.ProductService;
 import example.com.server.service.UserService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -19,6 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/products")
 public class ProductController {
@@ -78,7 +80,9 @@ public class ProductController {
             @RequestHeader(value = "Authorization", required = false) String authorization,
             @RequestBody Map<String, Object> body) {
         Long userId = jwtService.getUserIdFromToken(authorization);
+        log.info("Пользователь {} создает продукт.", userId);
         if (userId == null) {
+            log.error("Пользовател не авторизован!");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("error", "Authentication required"));
         }
@@ -100,8 +104,10 @@ public class ProductController {
             }
 
             Product product = productService.createProduct(userId, name, description, price, category, imageUrl);
+            log.debug("Пользователь успешно создал продукт {}", product.getName());
             return ResponseEntity.status(HttpStatus.CREATED).body(productToMap(product));
         } catch (IllegalArgumentException ex) {
+            log.error("Пользователь не смог создать продукт", ex);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("error", ex.getMessage()));
         }

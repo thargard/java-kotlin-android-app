@@ -7,6 +7,7 @@ import example.com.server.service.AuthService;
 import example.com.server.service.GoogleTokenVerifier;
 import example.com.server.service.JwtService;
 import example.com.server.service.UserService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/auth")
+@Slf4j
 public class AuthController {
 
     private final AuthService authService;
@@ -37,11 +39,14 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody User user) {
+        log.info("Начало создания пользователя: {}", user);
         try {
             User created = authService.register(user);
             String jwt = jwtService.generateToken(created);
+            log.debug("Пользователь {} успешно создан", created);
             return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("token", jwt));
         } catch (IllegalArgumentException ex) {
+            log.error("Ошибка при создании пользователя: {}", user, ex);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("error", ex.getMessage()));
         }
@@ -51,15 +56,17 @@ public class AuthController {
     public ResponseEntity<?> login(@RequestBody Map<String, String> credentials) {
         String login = credentials.get("login");
         String password = credentials.get("password");
-
+        log.info("Вход пользователя: {}", login);
         try {
             Optional<User> user = authService.login(login, password);
             String jwt = jwtService.generateToken(user.get());
             Map<String, String> response = new HashMap<>();
             response.put("token", jwt);
             response.put("user", gson.toJson(user.get()));
+            log.debug("Пользователь {} успешно вошел", login);
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (Exception e) {
+            log.error("Ошибка при входе пользователя: {}", login);
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         }
     }
